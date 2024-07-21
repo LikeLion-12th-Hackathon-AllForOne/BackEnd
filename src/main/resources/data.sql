@@ -28,7 +28,8 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '친구', 2, now() from tbl_code c where c.code_name = 'category';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '연인', 3, now() from tbl_code c where c.code_name = 'category';
 -- paper
---insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '편지지 파일 명', 1, now() from tbl_code c where c.code_name = 'paper';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '무료', 1, now() from tbl_code c where c.code_name = 'paper';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '유료', 2, now() from tbl_code c where c.code_name = 'paper';
 -- question
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comTarget', 1, now() from tbl_code c where c.code_name = 'question';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comAll', 2, now() from tbl_code c where c.code_name = 'question';
