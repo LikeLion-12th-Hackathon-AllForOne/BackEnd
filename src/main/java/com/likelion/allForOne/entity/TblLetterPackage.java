@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblLetterPackage {
+public class TblLetterPackage {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +32,5 @@ public class tblLetterPackage {
     @Comment(value="그룹 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_seq", nullable = false)
-    private tblGroup groupSeq;              //그룹 구분자
+    private TblGroup groupSeq;              //그룹 구분자
 }

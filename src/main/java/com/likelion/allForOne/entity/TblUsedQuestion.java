@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblUsedQuestion {
+public class TblUsedQuestion {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,25 +29,25 @@ public class tblUsedQuestion {
     @ManyToOne
     @Comment(value="질문 코드 구분자")
     @JoinColumn(name = "code_question", nullable = false)
-    private tblCode codeQuestion;   //질문코드 구분자
+    private TblCode codeQuestion;   //질문코드 구분자
 
     @Comment(value="공통질문 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "com_question_seq")
-    private tblComQuestion comQuestionSeq;//공통질문 구분자
+    private TblComQuestion comQuestionSeq;//공통질문 구분자
 
     @Comment(value="질문 생성자 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "add_question_seq")
-    private tblAddQuestion addQuestionSeq;//추가질문 구분자
+    private TblAddQuestion addQuestionSeq;//추가질문 구분자
 
     @Comment(value="그룹 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_seq", nullable = false)
-    private tblGroup groupSeq;              //그룹 구분자
+    private TblGroup groupSeq;              //그룹 구분자
 
     @Comment(value="질문 생성자 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_target")
-    private tblGroupMember memberTarget;    //질문대상자 구분자
+    private TblGroupMember memberTarget;    //질문대상자 구분자
 }

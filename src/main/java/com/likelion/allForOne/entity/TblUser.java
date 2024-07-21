@@ -13,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblUser extends BaseEntity {
+public class TblUser extends BaseEntity {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,5 +34,5 @@ public class tblUser extends BaseEntity {
     @ManyToOne
     @Comment(value="mbti 구분자")
     @JoinColumn(name = "code_mbti", nullable = false)
-    private tblCode codeMbti;   //mbti 구분자
+    private TblCode codeMbti;   //mbti 구분자
 }
