@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Comment;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,15 +17,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 고유 식별자
-
     @CreatedDate
+    @Comment(value="생성 시간")
     @Column(updatable = false)
     private LocalDateTime createDate; // 생성 시간
 
     @LastModifiedDate
+    @Comment(value="수정 시간")
     private LocalDateTime updateDate; // 수정 시간
 
 }
