@@ -26,8 +26,8 @@ public class tblGroup extends BaseEntity {
     private String groupInviteCode; //그룹 초대코드
 
 
+    @ManyToOne
     @Comment(value="카테고리 구분자")
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "code_Category", nullable = false)
     private tblCode codeCategory;   //카테고리 구분자
 
