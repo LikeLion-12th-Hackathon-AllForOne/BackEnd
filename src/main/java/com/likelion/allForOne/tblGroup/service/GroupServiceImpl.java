@@ -2,7 +2,6 @@ package com.likelion.allForOne.tblGroup.service;
 
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblGroup;
-import com.likelion.allForOne.entity.TblLetterPackage;
 import com.likelion.allForOne.entity.TblUser;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.CustomException;

@@ -29,7 +29,11 @@ public class LetterPackageServiceImpl {
         return letterPackageRepository.save(letterPackage).getPackageSeq();
     }
 
-    // 보따리 달성 개수 랜덤 생성
+    /**
+     * 보따리 달성 개수 랜덤 생성
+     * @param groupMemberCnt int:그룹 참여 인원수
+     * @return int:보따리 달성 개수(packageObjective)
+     */
     private int createObjective(int groupMemberCnt){
         //최소 = groupMemberCnt*5 / 최대 = 최소+20
         int min = groupMemberCnt*5;
