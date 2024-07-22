@@ -1,7 +1,7 @@
 package com.likelion.allForOne.tblCode.service;
 
-import java.util.List;
+import com.likelion.allForOne.global.response.ApiResponse;
 
 public interface CodeService {
-    List<?> findListUnit2(String codeName);  // 1분류 아래 2분류 리스트 조회
+    ApiResponse<?> findListSelectList(String codeName);  // 공통코드 select box 리스트 조회
 }
