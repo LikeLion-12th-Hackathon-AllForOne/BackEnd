@@ -64,6 +64,21 @@ public class CodeServiceImpl implements CodeService {
         return dtoList;
     }
 
+    /**
+     * 코드 유효성 검사
+     * @param parentName String:상위분류 코드명
+     * @param codeSeq Long:코드구분자
+     * @return boolean
+     */
+    public boolean codeValidationCheck(String parentName, Long codeSeq){
+        //1. codeSeq 로 등록된 코드확인
+        Optional<TblCode> codeOpt = codeRepository.findById(codeSeq);
+        if(codeOpt.isEmpty()) return false;
+
+        //2. 해당 코드의 상위 분류와 parentName 이 동일 여부 return
+        System.out.println("parentName ::"+codeOpt.get().getCodeParent().getCodeName());
+        return parentName.equals(codeOpt.get().getCodeParent().getCodeName());
+    }
 
 
 }
