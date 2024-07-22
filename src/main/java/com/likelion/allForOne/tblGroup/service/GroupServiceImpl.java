@@ -74,6 +74,22 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * 초대코드 조회
+     * @param groupSeq Long:그룹 구분자
+     * @param userSeq Long:로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> findGroupInviteCode(Long groupSeq, Long userSeq) {
+        //1. 그룹의 방장 사용자가 로그인 사용자와 일치하는지 확인
+        Optional<TblGroup> tblGroup = groupRepository.findByGroupSeqAndUserOwner_UserSeq(groupSeq, userSeq);
+        if (tblGroup.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
+
+        //2. 일치하는 경우, 초대코드 return
+        return ApiResponse.SUCCESS(SuccessCode.FOUND_LIST, tblGroup.get().getGroupInviteCode());
+    }
+
+    /**
      * 초대코드 생성
      * @return String:랜덤으로 생성된 초대코드
      */

@@ -6,28 +6,38 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/group")
 public class GroupController {
     private final GroupServiceImpl groupService;
+//    private final HttpServletRequest request;
 
     /**
      * 방(그룹) 생성
      * @param data GroupRequestDto.saveOneGroup:방(그룹) 생성시 필요한 데이터
-     * @param request HttpServletRequest:세션 로그인 정보
      * @return ResponseEntity<?>
      */
     @PostMapping("/create/group")
-    public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data, HttpServletRequest request){
+    public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data){
 //        HttpSession session = request.getSession(false);
 //        Long userSeq = (Long) session.getAttribute("userSeq");
         Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.saveOneGroup(data, userSeq));
+    }
+
+    /**
+     * 초대코드 조회
+     * @param groupSeq Long:그룹 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/{groupSeq}/findInviteCode")
+    public ResponseEntity<?> findGroupInviteCode(@PathVariable("groupSeq") Long groupSeq){
+//        HttpSession session = request.getSession(false);
+//        Long userSeq = (Long) session.getAttribute("userSeq");
+        Long userSeq = 1L;
+        return ResponseEntity.ok().body(groupService.findGroupInviteCode(groupSeq, userSeq));
     }
 }
