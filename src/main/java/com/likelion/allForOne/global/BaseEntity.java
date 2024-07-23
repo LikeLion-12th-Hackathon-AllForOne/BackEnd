@@ -16,15 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 고유 식별자
-
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createDate; // 생성 시간
 
     @LastModifiedDate
     private LocalDateTime updateDate; // 수정 시간
-
 }
