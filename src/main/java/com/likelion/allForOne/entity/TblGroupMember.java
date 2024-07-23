@@ -22,15 +22,15 @@ public class TblGroupMember extends BaseEntity {
     @Comment(value="그룹 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_seq", nullable = false)
-    private TblGroup groupSeq;  //그룹 구분자
+    private TblGroup group;  //그룹 구분자
 
     @Comment(value="사용자 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq", nullable = false)
-    private TblUser userSeq;  //사용자 구분자
+    private TblUser user;  //사용자 구분자
 
     @ManyToOne
     @Comment(value="편지보따리 확인코드 구분자")
     @JoinColumn(name = "code_package", nullable = false)
-    private TblCode codePackage;  //편지보따리 확인코드 구분자
+    private TblCode codePackage;  //편지보따리 확인코드 구분자(codeSeq: 30=확인, 31=미확인)
 }

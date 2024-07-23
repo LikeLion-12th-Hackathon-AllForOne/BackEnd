@@ -87,6 +87,52 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * 참여 방(그룹) 리스트
+     * @param userSeq Long:로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> findListJoinGroup(Long userSeq) {
+        //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요.
+
+        //2. 사용자가 참가하고 있는 방 리스트 찾기
+        List<TblGroupMember> groupListEntity = groupMemberRepository.findByUser_UserSeq(userSeq);
+        if (groupListEntity.isEmpty())
+            return ApiResponse.SUCCESS(SuccessCode.FOUND_NO_SEARCH_RESULT,
+                    GroupResponseDto.findListJoinGroup.builder()
+                            .userImg("imgfile.jpg")
+                            .userName("관리자")
+                            .build());
+
+        //3. entity -> dto 변환
+        List<GroupDto.participateInfo> list = new ArrayList<>();
+        for(TblGroupMember entity : groupListEntity) {
+            //3-1. group entity 조회(지연 로딩으로 추가 검색 필요.)
+            Optional<TblGroup> groupOpt = groupRepository.findById(entity.getGroup().getGroupSeq());
+            if (groupOpt.isEmpty()) continue;
+
+            TblGroup group = groupOpt.get();
+            list.add(GroupDto.participateInfo.builder()
+                            .memberSeq(entity.getMemberSeq())
+                            .groupName(group.getGroupName())
+                            .categoryName(group.getCodeCategory().getCodeName())
+                            .ownerName(group.getUserOwner().getUserName())
+                            .ownerYn(userSeq.equals(group.getUserOwner().getUserSeq()))
+                            .fullPackageYn("미확인".equals(entity.getCodePackage().getCodeName()))
+                            .build());
+        }
+
+        //4. 조회 결과 반환
+        return ApiResponse.SUCCESS(
+                SuccessCode.FOUND_IT,
+                GroupResponseDto.findListJoinGroup.builder()
+                        .userImg("imgfile.jpg")
+                        .userName("관리자")
+                        .list(list)
+                        .build());
+    }
+
+    /**
      * 초대코드 조회
      * @param groupSeq Long:그룹 구분자
      * @param userSeq Long:로그인 사용자 구분자

@@ -29,6 +29,18 @@ public class GroupController {
     }
 
     /**
+     * 참여 방(그룹) 리스트
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/findList/joinGroup")
+    public ResponseEntity<?> findListJoinGroup(){
+//        HttpSession session = request.getSession(false);
+//        Long userSeq = (Long) session.getAttribute("userSeq");
+        Long userSeq = 1L;
+        return ResponseEntity.ok().body(groupService.findListJoinGroup(userSeq));
+    }
+
+    /**
      * 초대코드 조회
      * @param groupSeq Long:그룹 구분자
      * @return ResponseEntity<?>

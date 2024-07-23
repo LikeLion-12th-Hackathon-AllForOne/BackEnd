@@ -31,8 +31,8 @@ public class TblGroup extends BaseEntity {
     @JoinColumn(name = "code_category", nullable = false)
     private TblCode codeCategory;   //카테고리 구분자
 
+    @ManyToOne
     @Comment(value="방장 사용자 구분자")
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_owner", nullable = false)
     private TblUser userOwner;      //방장 사용자 구분자
 
