@@ -2,6 +2,7 @@ package com.likelion.allForOne.tblGroup.service;
 
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblGroup;
+import com.likelion.allForOne.entity.TblGroupMember;
 import com.likelion.allForOne.entity.TblUser;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.CustomException;
@@ -9,12 +10,18 @@ import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
 import com.likelion.allForOne.tblCode.service.CodeServiceImpl;
 import com.likelion.allForOne.tblGroup.TblGroupRepository;
+import com.likelion.allForOne.tblGroup.dto.GroupDto;
 import com.likelion.allForOne.tblGroup.dto.GroupRequestDto;
+import com.likelion.allForOne.tblGroup.dto.GroupResponseDto;
+import com.likelion.allForOne.tblGroupMember.GroupMemberServiceImpl;
+import com.likelion.allForOne.tblGroupMember.TblGroupMemberRepository;
 import com.likelion.allForOne.tblLetterPackage.LetterPackageServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -23,8 +30,10 @@ import java.util.Random;
 @Transactional(readOnly = true)
 public class GroupServiceImpl implements GroupService {
     private final TblGroupRepository groupRepository;
+    private final TblGroupMemberRepository groupMemberRepository;
     private final CodeServiceImpl codeService;
     private final LetterPackageServiceImpl letterPackageService;
+    private final GroupMemberServiceImpl groupMemberService;
 
     /**
      * 방(그룹) 생성
@@ -67,9 +76,13 @@ public class GroupServiceImpl implements GroupService {
 
         //7. 선물보따리 생성
         Long packageSeq = letterPackageService.saveLetterPackage(tblGroup);
-
-        //8. return
         if(packageSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
+
+        //8. 회원 등록
+        Long memberSeq = groupMemberService.saveGroupMember(tblGroup);
+        if(memberSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
+
+        //9. return
         return ApiResponse.SUCCESS(SuccessCode.CREATE_GROUP);
     }
 
