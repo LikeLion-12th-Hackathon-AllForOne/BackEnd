@@ -20,7 +20,7 @@ public class GroupController {
      * @param data GroupRequestDto.saveOneGroup:방(그룹) 생성시 필요한 데이터
      * @return ResponseEntity<?>
      */
-    @PostMapping("/create/group")
+    @PostMapping("/create")
     public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data){
 //        HttpSession session = request.getSession(false);
 //        Long userSeq = (Long) session.getAttribute("userSeq");
@@ -51,5 +51,18 @@ public class GroupController {
 //        Long userSeq = (Long) session.getAttribute("userSeq");
         Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.findGroupInviteCode(groupSeq, userSeq));
+    }
+
+    /**
+     * 초대코드 입장-회원 등록
+     * @param data GroupRequestDto.saveGroupMemberByInviteCode:입력받은 초대코드
+     * @return ResponseEntity<?>
+     */
+    @PostMapping("/join")
+    public ResponseEntity<?> saveGroupMemberByInviteCode(@RequestBody GroupRequestDto.saveGroupMemberByInviteCode data) {
+//        HttpSession session = request.getSession(false);
+//        Long userSeq = (Long) session.getAttribute("userSeq");
+        Long userSeq = 2L;
+        return ResponseEntity.ok().body(groupService.saveGroupMemberByInviteCode(data, userSeq));
     }
 }

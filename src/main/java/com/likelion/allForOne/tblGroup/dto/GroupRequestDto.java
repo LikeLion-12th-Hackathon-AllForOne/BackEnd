@@ -10,10 +10,10 @@ public class GroupRequestDto {
         private Integer groupMemberCnt; // 인원수
         private String groupName;       // 그룹명
     }
-//    @Data
-//    public static class saveGroupMemberByInviteCode {
-//        private String groupInviteCode;
-//    }
+    @Data
+    public static class saveGroupMemberByInviteCode {
+        private String groupInviteCode;
+    }
 //    @Data
 //    public static class finsGroupDetail {
 //        private Long groupSeq;

@@ -44,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public ApiResponse<?> saveOneGroup(GroupRequestDto.saveOneGroup data, Long userSeq) {
-        //1. 유저 정보 확인 (로그인 기능 완료 후 추가)
+        //1. 유저 정보 확인 (로그인 기능 완료 후 추가) (수정필요)
 
         //2. 카테고리 코드 구분자 유효성 확인
         boolean codeValidation = codeService.codeValidationCheck("category", data.getCodeCategorySeq());
@@ -79,7 +79,7 @@ public class GroupServiceImpl implements GroupService {
         if(packageSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
 
         //8. 회원 등록
-        Long memberSeq = groupMemberService.saveGroupMember(tblGroup);
+        Long memberSeq = groupMemberService.saveGroupMember(tblGroup, tblGroup.getUserOwner());
         if(memberSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
 
         //9. return
@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public ApiResponse<?> findListJoinGroup(Long userSeq) {
-        //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요.
+        //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요. (수정필요)
 
         //2. 사용자가 참가하고 있는 방 리스트 찾기
         List<TblGroupMember> groupListEntity = groupMemberRepository.findByUser_UserSeq(userSeq);
@@ -146,6 +146,39 @@ public class GroupServiceImpl implements GroupService {
 
         //2. 일치하는 경우, 초대코드 return
         return ApiResponse.SUCCESS(SuccessCode.FOUND_LIST, tblGroup.get().getGroupInviteCode());
+    }
+
+    /**
+     * 초대코드 입장-회원 등록
+     * @param data GroupRequestDto.saveGroupMemberByInviteCode
+     * @param userSeq Long:로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> saveGroupMemberByInviteCode(GroupRequestDto.saveGroupMemberByInviteCode data, Long userSeq) {
+        //1. 로그인 사용자 정보 확인 (수정필요)
+        TblUser user = TblUser.builder().userSeq(userSeq).build();
+
+        //2. 초대코드로 그룹 조회
+        Optional<TblGroup> joinGroupOpt = groupRepository.findByGroupInviteCode(data.getGroupInviteCode());
+        if (joinGroupOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+        TblGroup joinGroup = joinGroupOpt.get();
+
+        //3. 해당 그룹에 이미 가입된 경우 확인
+        boolean checkGroupMember = groupMemberService.checkGroupMember(joinGroup.getGroupSeq(), userSeq);
+        if (checkGroupMember) return ApiResponse.ERROR(ErrorCode.ALREADY_EXISTING);
+
+        //4. 그룹 인원수와 멤버 등록된 인원수 확인
+        long cntJoinMember = groupMemberService.cntJoinGroupMember(joinGroup.getGroupSeq());
+        if (cntJoinMember >= joinGroup.getGroupMemberCnt()) return ApiResponse.ERROR(ErrorCode.ALREADY_FULL);
+
+        //5. 멤버 등록
+        Long memberSeq = groupMemberService.saveGroupMember(joinGroup, user);
+        if(memberSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
+
+        //6. 결과 반환
+        return ApiResponse.SUCCESS(SuccessCode.JOIN_MEMBER);
     }
 
     /**
