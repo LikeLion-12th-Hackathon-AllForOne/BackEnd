@@ -14,7 +14,6 @@ import com.likelion.allForOne.tblGroup.dto.GroupDto;
 import com.likelion.allForOne.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.tblGroup.dto.GroupResponseDto;
 import com.likelion.allForOne.tblGroupMember.GroupMemberServiceImpl;
-import com.likelion.allForOne.tblGroupMember.TblGroupMemberRepository;
 import com.likelion.allForOne.tblLetterPackage.LetterPackageServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ import java.util.Random;
 @Transactional(readOnly = true)
 public class GroupServiceImpl implements GroupService {
     private final TblGroupRepository groupRepository;
-    private final TblGroupMemberRepository groupMemberRepository;
+
     private final CodeServiceImpl codeService;
     private final LetterPackageServiceImpl letterPackageService;
     private final GroupMemberServiceImpl groupMemberService;
@@ -96,7 +95,7 @@ public class GroupServiceImpl implements GroupService {
         //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요. (수정필요)
 
         //2. 사용자가 참가하고 있는 방 리스트 찾기
-        List<TblGroupMember> groupListEntity = groupMemberRepository.findByUser_UserSeq(userSeq);
+        List<TblGroupMember> groupListEntity = groupMemberService.findListGroupMember(userSeq);
         if (groupListEntity.isEmpty())
             return ApiResponse.SUCCESS(SuccessCode.FOUND_NO_SEARCH_RESULT,
                     GroupResponseDto.findListJoinGroup.builder()

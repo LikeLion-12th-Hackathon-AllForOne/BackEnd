@@ -7,6 +7,7 @@ import com.likelion.allForOne.entity.TblUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +29,15 @@ public class GroupMemberServiceImpl {
                         .build()) //codeSeq: 30=확인, 31=미확인
                 .build();
         return groupMemberRepository.save(groupMember).getMemberSeq();
+    }
+
+    /**
+     * 특정 사용자의 그룹회원 리스트 조회
+     * @param userSeq Long: 사용자 구분자
+     * @return List<TblGroupMember>:특정 사용자의 그룹회원 리스트
+     */
+    public List<TblGroupMember> findListGroupMember(Long userSeq){
+        return groupMemberRepository.findByUser_UserSeq(userSeq);
     }
 
     /**
