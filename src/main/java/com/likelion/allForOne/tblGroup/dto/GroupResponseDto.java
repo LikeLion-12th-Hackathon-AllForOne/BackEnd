@@ -27,12 +27,5 @@ public class GroupResponseDto {
         private int achievePercent;                             //보따리 달성 퍼센트
         private QuestionDto.todayQuiz todayQuiz;                //오늘의 퀴즈
         private List<GroupMemberDto.profile> groupMemberList;   //그룹멤버 프로필 리스트
-
-        public void setMemberList(List<TblGroupMember> groupMemberList) {
-            for(TblGroupMember entity : groupMemberList){
-
-
-            }
-        }
     }
 }
