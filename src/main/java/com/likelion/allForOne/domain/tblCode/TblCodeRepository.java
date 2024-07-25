@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface TblCodeRepository extends JpaRepository<TblCode, Long> {
     Optional<TblCode> findByCodeUnitAndCodeName(int codeUnit, String codeName);
     List<TblCode> findByCodeParent_CodeSeq(Long codeParentSeq);
+    TblCode findByCodeSeq(Long codeSeq);
 }
