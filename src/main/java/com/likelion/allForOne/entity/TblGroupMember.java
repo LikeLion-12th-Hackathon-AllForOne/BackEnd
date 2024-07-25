@@ -24,8 +24,8 @@ public class TblGroupMember extends BaseEntity {
     @JoinColumn(name = "group_seq", nullable = false)
     private TblGroup group;  //그룹 구분자
 
+    @ManyToOne
     @Comment(value="사용자 구분자")
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_seq", nullable = false)
     private TblUser user;  //사용자 구분자
 

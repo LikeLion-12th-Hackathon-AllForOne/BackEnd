@@ -17,7 +17,7 @@ public class TblAddQuestion extends BaseEntity {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long codeSeq;                   //구분자
+    private Long addQuestionSeq;            //구분자
     @Column(columnDefinition = "varchar(50) not null comment '질문 내용'")
     private String addQuestion;             //질문 내용
 

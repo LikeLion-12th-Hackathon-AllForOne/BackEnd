@@ -65,4 +65,18 @@ public class GroupController {
         Long userSeq = 2L;
         return ResponseEntity.ok().body(groupService.saveGroupMemberByInviteCode(data, userSeq));
     }
+
+    /**
+     * 그룹 정보 상세 조회
+     * @param groupSeq Long:그룹 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/{groupSeq}/findDetails")
+    public ResponseEntity<?> findGroupDetail(@PathVariable("groupSeq") Long groupSeq){
+//        HttpSession session = request.getSession(false);
+//        Long userSeq = (Long) session.getAttribute("userSeq");
+        Long userSeq = 1L;
+//        Long userSeq = 2L;
+        return ResponseEntity.ok().body(groupService.findGroupDetail(groupSeq, userSeq));
+    }
 }

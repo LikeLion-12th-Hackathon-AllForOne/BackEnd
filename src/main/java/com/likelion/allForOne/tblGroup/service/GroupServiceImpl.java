@@ -1,9 +1,6 @@
 package com.likelion.allForOne.tblGroup.service;
 
-import com.likelion.allForOne.entity.TblCode;
-import com.likelion.allForOne.entity.TblGroup;
-import com.likelion.allForOne.entity.TblGroupMember;
-import com.likelion.allForOne.entity.TblUser;
+import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.CustomException;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
@@ -13,12 +10,17 @@ import com.likelion.allForOne.tblGroup.TblGroupRepository;
 import com.likelion.allForOne.tblGroup.dto.GroupDto;
 import com.likelion.allForOne.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.tblGroup.dto.GroupResponseDto;
+import com.likelion.allForOne.tblGroupMember.GroupMemberDto;
 import com.likelion.allForOne.tblGroupMember.GroupMemberServiceImpl;
 import com.likelion.allForOne.tblLetterPackage.LetterPackageServiceImpl;
+import com.likelion.allForOne.tblQuestion.QuestionDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +95,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public ApiResponse<?> findListJoinGroup(Long userSeq) {
         //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요. (수정필요)
+        TblUser user = TblUser.builder().userSeq(userSeq).build();
 
         //2. 사용자가 참가하고 있는 방 리스트 찾기
         List<TblGroupMember> groupListEntity = groupMemberService.findListGroupMember(userSeq);
@@ -181,6 +184,57 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * 그룹 정보 상세 조회
+     * @param groupSeq Long: 그룹 구분자
+     * @param userSeq Long: 로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> findGroupDetail(Long groupSeq, Long userSeq) {
+        //1. userSeq 사용해서 사용자 로그인 정보 확인 (수정필요)
+
+        //2. groupSeq 사용해서 그룹 정보 조회
+        Optional<TblGroup> groupOpt = groupRepository.findById(groupSeq);
+        if(groupOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+        TblGroup group = groupOpt.get();
+
+        //3. 편지보따리 달성도 조회
+        int achievePercent = letterPackageService.packageAchievePercent(groupSeq);
+
+        //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업) (수정필요)
+        TblUsedQuestion question = null;
+
+        //5. 그룹멤버 프로필 조회
+        List<GroupMemberDto.profile> profileList = new ArrayList<>();
+        List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
+        for(TblGroupMember entity : groupMemberList){
+            profileList.add(GroupMemberDto.profile.builder()
+                    .groupSeq(entity.getMemberSeq())
+                    .userName(entity.getUser().getUserName())
+                    .userBirth(entity.getUser().getUserBirth())
+                    .userPhone(entity.getUser().getUserPhone())
+                    .codeName(entity.getUser().getCodeMbti().getCodeName())
+                    .build());
+        }
+
+        //6. 데이터 dto 전환
+        GroupResponseDto.findGroupDetail result = GroupResponseDto.findGroupDetail.builder()
+                .ownerYn(userSeq.equals(group.getUserOwner().getUserSeq()))
+                .groupName(group.getGroupName())
+                .dayAfterCnt(group.getCreateDate().toLocalDate().until(LocalDate.now(), ChronoUnit.DAYS)+1)
+                .achievePercent(achievePercent)
+                .todayQuiz(QuestionDto.todayQuiz.builder()
+                        .usedQuestionSeq(null)
+                        .question("일단 마음대로 질문 넣어높고 질문 파트 완료되면 구현 넣어야지.")
+                        .build())
+                .groupMemberList(profileList)
+                .build();
+
+        //7. 결과 반환
+        return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
+    }
+
+    /**
      * 초대코드 생성
      * @return String:랜덤으로 생성된 초대코드
      */
@@ -195,4 +249,5 @@ public class GroupServiceImpl implements GroupService {
         }
         return sb.toString();
     }
+
 }

@@ -41,6 +41,15 @@ public class GroupMemberServiceImpl {
     }
 
     /**
+     * 특정 그룹의 그룹회원 리스트 조회
+     * @param groupSeq Long: 그룹 구분자
+     * @return List<TblGroupMember>:특정 사용자의 그룹회원 리스트
+     */
+    public List<TblGroupMember> findListGroupMemberByGroup(Long groupSeq){
+        return groupMemberRepository.findByUser_UserSeq(groupSeq);
+    }
+
+    /**
      * 특정 사용자의 특정 그룹 가입 여부 확인
      * @param groupSeq Long:그룹 구분자
      * @param userSeq Long: 사용자 구분자

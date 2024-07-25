@@ -14,8 +14,8 @@ public class GroupRequestDto {
     public static class saveGroupMemberByInviteCode {
         private String groupInviteCode;
     }
-//    @Data
-//    public static class finsGroupDetail {
-//        private Long groupSeq;
-//    }
+    @Data
+    public static class findGroupDetail {
+        private Long groupSeq;
+    }
 }
