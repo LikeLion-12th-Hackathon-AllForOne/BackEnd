@@ -25,5 +25,4 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Comment(value="수정 시간")
     private LocalDateTime updateDate; // 수정 시간
-
 }
