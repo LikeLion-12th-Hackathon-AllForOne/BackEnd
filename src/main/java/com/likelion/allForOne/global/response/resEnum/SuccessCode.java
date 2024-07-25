@@ -12,7 +12,8 @@ public enum SuccessCode {
     FOUND_IT(201, "조회가 완료되었습니다."),
     FOUND_LIST(201, "목록 조회가 완료되었습니다."),
     FOUND_NO_SEARCH_RESULT(200, "조회결과가 없습니다."),
-    CREATE_USER(201, "회원가입이 완료되었습니다.")
+    CREATE_USER(201, "회원가입이 완료되었습니다."),
+    ID_AVAILABLE(200, "사용 가능한 ID입니다.")
     ;
 
     private final Integer code;

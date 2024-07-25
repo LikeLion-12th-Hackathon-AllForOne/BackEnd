@@ -5,4 +5,6 @@ import com.likelion.allForOne.global.response.ApiResponse;
 
 public interface UserService {
     ApiResponse<?> join(UserRequestDto.UserJoinRequestDto userJoinRequestDto); // 회원가입
+
+    ApiResponse<?> checkIdDuplicate(String userId); // ID 중복체크
 }

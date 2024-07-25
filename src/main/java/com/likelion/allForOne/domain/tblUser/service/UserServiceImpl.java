@@ -2,11 +2,9 @@ package com.likelion.allForOne.domain.tblUser.service;
 
 import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
 import com.likelion.allForOne.domain.tblUser.TblUserRepository;
-import com.likelion.allForOne.domain.tblUser.dto.UserResponseDto;
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblUser;
 import com.likelion.allForOne.global.response.ApiResponse;
-import com.likelion.allForOne.global.response.CustomException;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +46,17 @@ public class UserServiceImpl implements UserService {
 
             return ApiResponse.SUCCESS(SuccessCode.CREATE_USER);
         } else return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+    }
+
+    /**
+     * ID 중복체크
+     * @param userId
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> checkIdDuplicate(String userId) {
+        TblUser user = userRepository.findByUserId(userId);
+        if (user != null) return ApiResponse.ERROR(ErrorCode.ALREADY_EXISTING);
+        else return ApiResponse.SUCCESS(SuccessCode.ID_AVAILABLE);
     }
 }

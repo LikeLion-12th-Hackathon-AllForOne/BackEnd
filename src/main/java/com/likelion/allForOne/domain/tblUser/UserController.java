@@ -18,4 +18,9 @@ public class UserController {
     public ResponseEntity<?> join(@RequestBody UserJoinRequestDto userJoinRequestDto) {
         return ResponseEntity.ok().body(userService.join(userJoinRequestDto));
     }
+
+    @GetMapping("/api/user/checkIdDuplicate")
+    public ResponseEntity<?> checkIdDuplicate(@RequestBody UserJoinRequestDto userJoinRequestDto) {
+        return ResponseEntity.ok().body(userService.checkIdDuplicate(userJoinRequestDto.getUserId()));
+    }
 }
