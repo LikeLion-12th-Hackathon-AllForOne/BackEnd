@@ -1,6 +1,6 @@
 package com.likelion.allForOne.domain.tblUser;
 
-import com.likelion.allForOne.domain.CodeRepository;
+import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblUser;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +12,8 @@ import com.likelion.allForOne.domain.tblUser.UserRequestDto.*;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final CodeRepository codeRepository;
+    private final TblUserRepository userRepository;
+    private final TblCodeRepository codeRepository;
 
     // 회원가입
     public UserResponseDto join(UserJoinRequestDto userJoinRequestDto) {
