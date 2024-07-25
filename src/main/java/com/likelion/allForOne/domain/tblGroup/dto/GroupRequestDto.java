@@ -1,4 +1,4 @@
-package com.likelion.allForOne.tblGroup.dto;
+package com.likelion.allForOne.domain.tblGroup.dto;
 
 import lombok.Data;
 

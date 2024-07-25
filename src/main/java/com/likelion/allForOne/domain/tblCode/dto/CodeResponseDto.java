@@ -1,6 +1,5 @@
-package com.likelion.allForOne.tblCode.dto;
+package com.likelion.allForOne.domain.tblCode.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;

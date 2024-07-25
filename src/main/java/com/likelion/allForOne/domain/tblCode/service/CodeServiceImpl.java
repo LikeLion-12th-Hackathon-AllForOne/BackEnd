@@ -1,12 +1,12 @@
-package com.likelion.allForOne.tblCode.service;
+package com.likelion.allForOne.domain.tblCode.service;
 
+import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
+import com.likelion.allForOne.domain.tblCode.dto.CodeResponseDto;
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
-import com.likelion.allForOne.tblCode.TblCodeRepository;
-import com.likelion.allForOne.tblCode.dto.CodeDto;
-import com.likelion.allForOne.tblCode.dto.CodeResponseDto;
+import com.likelion.allForOne.domain.tblCode.dto.CodeDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

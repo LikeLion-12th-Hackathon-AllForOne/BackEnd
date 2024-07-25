@@ -1,9 +1,7 @@
-package com.likelion.allForOne.tblGroup;
+package com.likelion.allForOne.domain.tblGroup;
 
-import com.likelion.allForOne.tblGroup.dto.GroupRequestDto;
-import com.likelion.allForOne.tblGroup.service.GroupServiceImpl;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
+import com.likelion.allForOne.domain.tblGroup.service.GroupServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

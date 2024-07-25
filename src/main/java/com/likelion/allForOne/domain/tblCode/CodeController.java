@@ -1,6 +1,6 @@
-package com.likelion.allForOne.tblCode;
+package com.likelion.allForOne.domain.tblCode;
 
-import com.likelion.allForOne.tblCode.service.CodeServiceImpl;
+import com.likelion.allForOne.domain.tblCode.service.CodeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package com.likelion.allForOne.tblGroup;
+package com.likelion.allForOne.domain.tblGroup;
 
 import com.likelion.allForOne.entity.TblGroup;
 import org.springframework.data.jpa.repository.JpaRepository;

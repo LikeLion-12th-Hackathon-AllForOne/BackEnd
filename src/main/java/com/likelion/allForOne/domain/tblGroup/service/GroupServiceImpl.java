@@ -1,25 +1,24 @@
-package com.likelion.allForOne.tblGroup.service;
+package com.likelion.allForOne.domain.tblGroup.service;
 
+import com.likelion.allForOne.domain.tblCode.service.CodeServiceImpl;
+import com.likelion.allForOne.domain.tblGroup.TblGroupRepository;
+import com.likelion.allForOne.domain.tblGroup.dto.GroupDto;
+import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
+import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
+import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
+import com.likelion.allForOne.domain.tblLetterPackage.LetterPackageServiceImpl;
+import com.likelion.allForOne.domain.tblQuestion.QuestionDto;
 import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.CustomException;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
-import com.likelion.allForOne.tblCode.service.CodeServiceImpl;
-import com.likelion.allForOne.tblGroup.TblGroupRepository;
-import com.likelion.allForOne.tblGroup.dto.GroupDto;
-import com.likelion.allForOne.tblGroup.dto.GroupRequestDto;
-import com.likelion.allForOne.tblGroup.dto.GroupResponseDto;
-import com.likelion.allForOne.tblGroupMember.GroupMemberDto;
-import com.likelion.allForOne.tblGroupMember.GroupMemberServiceImpl;
-import com.likelion.allForOne.tblLetterPackage.LetterPackageServiceImpl;
-import com.likelion.allForOne.tblQuestion.QuestionDto;
+import com.likelion.allForOne.domain.tblGroup.dto.GroupResponseDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;

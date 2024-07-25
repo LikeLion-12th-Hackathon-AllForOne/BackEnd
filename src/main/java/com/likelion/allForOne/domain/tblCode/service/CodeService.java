@@ -1,4 +1,4 @@
-package com.likelion.allForOne.tblCode.service;
+package com.likelion.allForOne.domain.tblCode.service;
 
 import com.likelion.allForOne.global.response.ApiResponse;
 

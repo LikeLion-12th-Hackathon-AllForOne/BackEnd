@@ -1,10 +1,8 @@
-package com.likelion.allForOne.tblGroup.dto;
+package com.likelion.allForOne.domain.tblGroup.dto;
 
-import com.likelion.allForOne.entity.TblGroupMember;
-import com.likelion.allForOne.tblGroupMember.GroupMemberDto;
-import com.likelion.allForOne.tblQuestion.QuestionDto;
+import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
+import com.likelion.allForOne.domain.tblQuestion.QuestionDto;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 import java.util.List;

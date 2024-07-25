@@ -1,4 +1,4 @@
-package com.likelion.allForOne.tblLetterPackage;
+package com.likelion.allForOne.domain.tblLetterPackage;
 
 import com.likelion.allForOne.entity.TblGroup;
 import com.likelion.allForOne.entity.TblLetterPackage;

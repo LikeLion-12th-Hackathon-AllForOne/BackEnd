@@ -1,7 +1,7 @@
-package com.likelion.allForOne.tblGroup.service;
+package com.likelion.allForOne.domain.tblGroup.service;
 
+import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.global.response.ApiResponse;
-import com.likelion.allForOne.tblGroup.dto.GroupRequestDto;
 
 public interface GroupService {
     ApiResponse<?> saveOneGroup(GroupRequestDto.saveOneGroup data, Long userSeq); //방(그룹) 생성

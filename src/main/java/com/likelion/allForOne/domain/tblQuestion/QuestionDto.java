@@ -1,4 +1,4 @@
-package com.likelion.allForOne.tblQuestion;
+package com.likelion.allForOne.domain.tblQuestion;
 
 import com.likelion.allForOne.entity.TblCode;
 import lombok.Builder;
