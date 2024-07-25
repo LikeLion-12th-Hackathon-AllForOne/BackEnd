@@ -209,7 +209,7 @@ public class GroupServiceImpl implements GroupService {
         List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
         for(TblGroupMember entity : groupMemberList){
             profileList.add(GroupMemberDto.profile.builder()
-                    .groupSeq(entity.getMemberSeq())
+                    .memberSeq(entity.getMemberSeq())
                     .userName(entity.getUser().getUserName())
                     .userBirth(entity.getUser().getUserBirth())
                     .userPhone(entity.getUser().getUserPhone())
