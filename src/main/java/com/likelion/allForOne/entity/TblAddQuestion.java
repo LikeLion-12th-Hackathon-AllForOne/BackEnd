@@ -13,21 +13,21 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblAddQuestion extends BaseEntity {
+public class TblAddQuestion extends BaseEntity {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long codeSeq;                   //구분자
+    private Long addQuestionSeq;            //구분자
     @Column(columnDefinition = "varchar(50) not null comment '질문 내용'")
     private String addQuestion;             //질문 내용
 
     @ManyToOne
     @Comment(value="질문 코드 구분자")
     @JoinColumn(name = "code_question", nullable = false)
-    private tblCode codeQuestion;           //질문 코드 구분자
+    private TblCode codeQuestion;           //질문 코드 구분자
 
     @Comment(value="질문 생성자 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_create", nullable = false)
-    private tblGroupMember memberCreate;    //질문 생성자 구분자
+    private TblGroupMember memberCreate;    //질문 생성자 구분자
 }

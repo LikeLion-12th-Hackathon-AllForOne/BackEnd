@@ -12,7 +12,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblLetterPaper {
+public class TblLetterPaper {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,5 +23,5 @@ public class tblLetterPaper {
     @ManyToOne
     @Comment(value="편지지 유/무료 코드 구분자")
     @JoinColumn(name = "code_paper", nullable = false)
-    private tblCode codePaper;      //편지지 유/무료 코드 구분자
+    private TblCode codePaper;      //편지지 유/무료 코드 구분자
 }

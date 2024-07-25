@@ -37,3 +37,8 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 -- package
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '확인', 1, now() from tbl_code c where c.code_name = 'package';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '미확인', 2, now() from tbl_code c where c.code_name = 'package';
+
+
+-- admin user
+insert into tbl_user (code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 6, now(), '20000123', 'admin', 'imgfile.jpg', '관리자', '01011111111', 'admin1234');

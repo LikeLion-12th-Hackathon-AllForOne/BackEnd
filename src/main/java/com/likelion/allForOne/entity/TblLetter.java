@@ -13,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblLetter extends BaseEntity {
+public class TblLetter extends BaseEntity {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,15 +31,15 @@ public class tblLetter extends BaseEntity {
     @Comment(value="받는사람 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_to", nullable = false)
-    private tblGroupMember memberTo;    //받는사람 구분자
+    private TblGroupMember memberTo;    //받는사람 구분자
 
     @Comment(value="보내는사람 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_from", nullable = false)
-    private tblGroupMember memberFrom;  //보내는사람 구분자
+    private TblGroupMember memberFrom;  //보내는사람 구분자
 
     @Comment(value="편지지 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paper_seq", nullable = false)
-    private tblLetterPaper paperSeq;  //편지지 구분자
+    private TblLetterPaper paperSeq;  //편지지 구분자
 }

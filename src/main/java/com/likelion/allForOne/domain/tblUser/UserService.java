@@ -1,8 +1,8 @@
 package com.likelion.allForOne.domain.tblUser;
 
 import com.likelion.allForOne.domain.CodeRepository;
-import com.likelion.allForOne.entity.tblCode;
-import com.likelion.allForOne.entity.tblUser;
+import com.likelion.allForOne.entity.TblCode;
+import com.likelion.allForOne.entity.TblUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,10 +19,10 @@ public class UserService {
     public UserResponseDto join(UserJoinRequestDto userJoinRequestDto) {
         // Todo.예외처리 수정 예정
         try {
-            tblCode codeMbti = codeRepository.findByCodeSeq(Long.valueOf(userJoinRequestDto.getCodeMbti()));
+            TblCode codeMbti = codeRepository.findByCodeSeq(Long.valueOf(userJoinRequestDto.getCodeMbti()));
 
             // 회원 객체 생성
-            tblUser user = tblUser.builder()
+            TblUser user = TblUser.builder()
                     .userId(userJoinRequestDto.getUserId())
                     .userPwd(userJoinRequestDto.getUserPwd())
                     .userName(userJoinRequestDto.getUserName())

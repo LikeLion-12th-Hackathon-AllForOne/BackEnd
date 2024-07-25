@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblLetterPackage {
+public class TblLetterPackage {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,13 +24,11 @@ public class tblLetterPackage {
     private Integer packageObjective;       //보따리 달성 개수
     @Column(columnDefinition = "tinyint default 0 not null comment '작성된 편지 개수'")
     private Integer packageCnt;             //작성된 편지 개수
-    @CreatedDate
-    @Comment(value="보따리 시작일시")
-    @Column(updatable = false)
+    @Column(columnDefinition = "datetime not null comment '보따리 시작일시'")
     private LocalDateTime packageStartDate; //보따리 시작일시
 
     @Comment(value="그룹 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_seq", nullable = false)
-    private tblGroup groupSeq;              //그룹 구분자
+    private TblGroup group;              //그룹 구분자
 }

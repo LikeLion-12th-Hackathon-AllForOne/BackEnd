@@ -13,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class tblCode extends BaseEntity {
+public class TblCode extends BaseEntity {
     @Id
     @Comment(value="구분자")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,6 @@ public class tblCode extends BaseEntity {
     @Comment(value="상위 분류 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "code_parent_seq")
-    private tblCode codeParent; //상위 분류 구분자
+    private TblCode codeParent; //상위 분류 구분자
 
 }
