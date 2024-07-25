@@ -1,9 +1,8 @@
-package com.likelion.allForOne.domain.tblUser;
+package com.likelion.allForOne.domain.tblUser.dto;
 
 import lombok.*;
 
 public class UserRequestDto {
-    // 회원가입
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor

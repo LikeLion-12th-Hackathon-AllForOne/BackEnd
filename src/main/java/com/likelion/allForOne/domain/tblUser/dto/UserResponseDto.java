@@ -1,4 +1,4 @@
-package com.likelion.allForOne.domain.tblUser;
+package com.likelion.allForOne.domain.tblUser.dto;
 
 import com.likelion.allForOne.entity.TblUser;
 import lombok.AllArgsConstructor;
