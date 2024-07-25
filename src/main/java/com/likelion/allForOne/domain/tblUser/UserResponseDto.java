@@ -1,6 +1,6 @@
 package com.likelion.allForOne.domain.tblUser;
 
-import com.likelion.allForOne.entity.tblUser;
+import com.likelion.allForOne.entity.TblUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class UserResponseDto {
     private String userImg;
     private String codeMbti;
 
-    public static UserResponseDto UserJoinResponseDto(tblUser user) {
+    public static UserResponseDto UserJoinResponseDto(TblUser user) {
         return UserResponseDto.builder()
                 .userSeq(user.getUserSeq())
                 .userId(user.getUserId())
