@@ -97,4 +97,16 @@ public class UserServiceImpl implements UserService {
             return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND); // LoginDto 값 비어 있을 때
         }
     }
+
+    /**
+     * 로그아웃
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> logout(HttpSession session) {
+        // 세션 무효화
+        session.invalidate();
+        return ApiResponse.SUCCESS(SuccessCode.LOGOUT_SUCCESS);
+    }
 }

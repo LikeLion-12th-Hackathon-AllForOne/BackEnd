@@ -10,4 +10,6 @@ public interface UserService {
     ApiResponse<?> checkIdDuplicate(String userId); // ID 중복체크
 
     ApiResponse<?> login(LoginDto loginDto, HttpSession session); // 로그인
+
+    ApiResponse<?> logout(HttpSession session); // 로그아웃
 }

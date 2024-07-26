@@ -33,4 +33,10 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto, HttpSession session) {
         return ResponseEntity.ok().body(userService.login(loginDto, session));
     }
+
+    // 로그아웃
+    @PostMapping("/api/user/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        return ResponseEntity.ok().body(userService.logout(session));
+    }
 }
