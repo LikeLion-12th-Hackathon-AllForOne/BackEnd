@@ -7,7 +7,7 @@ public class UserRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class UserJoinRequestDto {
+    public static class JoinDto {
         private Long userSeq;
         private String userId;
         private String userPwd;
@@ -16,6 +16,23 @@ public class UserRequestDto {
         private String userPhone;
         private String userImg;
         private String codeMbti;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CheckIdDuplicateDto {
+        private String userId;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class LoginDto {
+        private String userId;
+        private String userPwd;
     }
 }
 
