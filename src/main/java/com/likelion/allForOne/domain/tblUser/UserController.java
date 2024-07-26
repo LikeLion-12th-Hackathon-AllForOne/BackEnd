@@ -39,4 +39,10 @@ public class UserController {
     public ResponseEntity<?> logout(HttpSession session) {
         return ResponseEntity.ok().body(userService.logout(session));
     }
+
+    // 비밀번호 확인
+    @PostMapping("/api/user/checkPwd")
+    public ResponseEntity<?> checkPwd(@RequestBody CheckPwdDto checkPwdDto, HttpSession session) {
+        return ResponseEntity.ok().body(userService.checkPwd(checkPwdDto, session));
+    }
 }

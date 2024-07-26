@@ -34,5 +34,13 @@ public class UserRequestDto {
         private String userId;
         private String userPwd;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CheckPwdDto {
+        private String userPwd;
+    }
 }
 

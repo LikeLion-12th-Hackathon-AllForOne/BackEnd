@@ -109,4 +109,31 @@ public class UserServiceImpl implements UserService {
         session.invalidate();
         return ApiResponse.SUCCESS(SuccessCode.LOGOUT_SUCCESS);
     }
+
+    /**
+     * 비밀번호 확인
+     * @param checkPwdDto
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> checkPwd(CheckPwdDto checkPwdDto, HttpSession session) {
+        if (session != null) {
+            // 사용자 조회
+            TblUser user = userRepository.findByUserId(session.getAttribute("userId").toString());
+            if (user == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+
+            // 비밀번호 일치 확인
+            if (user.getUserPwd().equals(checkPwdDto.getUserPwd())) {
+                log.info("비밀번호가 일치합니다.");
+                return ApiResponse.SUCCESS(SuccessCode.PASSWORD_CORRECT);
+            } else {
+                log.error("비밀번호가 일치하지 않습니다.");
+                return ApiResponse.ERROR(ErrorCode.PASSWORD_INCORRECT);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
 }
