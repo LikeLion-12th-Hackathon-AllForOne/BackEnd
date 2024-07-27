@@ -45,4 +45,10 @@ public class UserController {
     public ResponseEntity<?> checkPwd(@RequestBody CheckPwdDto checkPwdDto, HttpSession session) {
         return ResponseEntity.ok().body(userService.checkPwd(checkPwdDto, session));
     }
+
+    // 내 정보 조회
+    @GetMapping("/api/user/searchUserInfo")
+    public ResponseEntity<?> searchUserInfo(HttpSession session) {
+        return ResponseEntity.ok().body(userService.searchUserInfo(session));
+    }
 }

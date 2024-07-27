@@ -14,4 +14,6 @@ public interface UserService {
     ApiResponse<?> logout(HttpSession session); // 로그아웃
 
     ApiResponse<?> checkPwd(CheckPwdDto checkPwdDto, HttpSession session); // 비밀번호 확인
+
+    ApiResponse<?> searchUserInfo(HttpSession session); // 내 정보 조회
 }
