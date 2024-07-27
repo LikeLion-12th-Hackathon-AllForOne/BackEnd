@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
                     .build();
             userRepository.save(user);
 
+            log.info("회원가입 완료, 사용자 ID {}", user.getUserId());
             return ApiResponse.SUCCESS(SuccessCode.CREATE_USER);
         } else return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
     }
@@ -61,9 +62,16 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ApiResponse<?> checkIdDuplicate(String userId) {
-        TblUser user = userRepository.findByUserId(userId);
-        if (user != null) return ApiResponse.ERROR(ErrorCode.ALREADY_EXISTING);
-        else return ApiResponse.SUCCESS(SuccessCode.ID_AVAILABLE);
+        // 사용자 조회
+        Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(userId));
+
+        if (user.isPresent()) {
+            log.info("이미 존재하는 ID, 사용자 ID {}", user.get().getUserId());
+            return ApiResponse.ERROR(ErrorCode.ALREADY_EXISTING);
+        } else {
+            log.info("사용 가능한 ID 입니다.");
+            return ApiResponse.SUCCESS(SuccessCode.ID_AVAILABLE);
+        }
     }
 
     /**
@@ -76,26 +84,27 @@ public class UserServiceImpl implements UserService {
     public ApiResponse<?> login(LoginDto loginDto, HttpSession session) {
         if (loginDto != null) {
             // 사용자 조회
-            TblUser user = userRepository.findByUserId(loginDto.getUserId());
-            if (user == null) {
+            Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(loginDto.getUserId()));
+
+            if (user.isPresent()) {
+                // 비밀번호 일치하는지 확인
+                if (user.get().getUserPwd().equals(loginDto.getUserPwd())) {
+                    // 세션값 저장
+                    session.setAttribute("userSeq", user.get().getUserSeq());
+                    session.setAttribute("userId", user.get().getUserId());
+                    session.setAttribute("userName", user.get().getUserName());
+                    session.setAttribute("userImg", user.get().getUserImg());
+                    session.setMaxInactiveInterval(30 * 60); // 30분 동안 세션 유지, 이후 자동 로그아웃
+
+                    log.info("로그인 성공, 사용자 ID {}", loginDto.getUserId());
+                    return ApiResponse.SUCCESS(SuccessCode.LOGIN_SUCCESS);
+                } else {
+                    log.error("로그인 실패 : 아이디, 비밀번호 불일치, 사용자 ID {}", loginDto.getUserId());
+                    return ApiResponse.ERROR(ErrorCode.LOGIN_FAIL); // 비밀번호 불일치 시 로그인 실패
+                }
+            } else {
                 log.error("로그인 실패 : 존재하지 않는 사용자, 사용자 ID {}", loginDto.getUserId());
                 return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);  // 존재하지 않는 사용자인 경우 Error
-            }
-
-            // 비밀번호 일치하는지 확인
-            if (user.getUserPwd().equals(loginDto.getUserPwd())) {
-                // 세션값 저장
-                session.setAttribute("userSeq", user.getUserSeq());
-                session.setAttribute("userId", user.getUserId());
-                session.setAttribute("userName", user.getUserName());
-                session.setAttribute("userImg", user.getUserImg());
-                session.setMaxInactiveInterval(30*60); // 30분 동안 세션 유지, 이후 자동 로그아웃
-
-                log.info("로그인 성공, 사용자 ID {}", loginDto.getUserId());
-                return ApiResponse.SUCCESS(SuccessCode.LOGIN_SUCCESS);
-            } else {
-                log.error("로그인 실패 : 아이디, 비밀번호 불일치, 사용자 ID {}", loginDto.getUserId());
-                return ApiResponse.ERROR(ErrorCode.LOGIN_FAIL); // 비밀번호 불일치 시 로그인 실패
             }
         } else {
             log.error("로그인 실패 : LoginDto가 비어 있습니다.");
@@ -126,17 +135,18 @@ public class UserServiceImpl implements UserService {
         if (session != null) {
             if (session.getAttribute("userId") != null) {
                 // 사용자 조회
-                TblUser user = userRepository.findByUserId(session.getAttribute("userId").toString());
-                if (user == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
 
-                // 비밀번호 일치 확인
-                if (user.getUserPwd().equals(checkPwdDto.getUserPwd())) {
-                    log.info("비밀번호가 일치합니다.");
-                    return ApiResponse.SUCCESS(SuccessCode.PASSWORD_CORRECT);
-                } else {
-                    log.error("비밀번호가 일치하지 않습니다.");
-                    return ApiResponse.ERROR(ErrorCode.PASSWORD_INCORRECT);
-                }
+                if (user.isPresent()) {
+                    // 비밀번호 일치 확인
+                    if (user.get().getUserPwd().equals(checkPwdDto.getUserPwd())) {
+                        log.info("비밀번호가 일치합니다.");
+                        return ApiResponse.SUCCESS(SuccessCode.PASSWORD_CORRECT);
+                    } else {
+                        log.error("비밀번호가 일치하지 않습니다.");
+                        return ApiResponse.ERROR(ErrorCode.PASSWORD_INCORRECT);
+                    }
+                } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
             } else {
                 log.error("세션이 만료되었습니다.");
                 return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
@@ -157,22 +167,25 @@ public class UserServiceImpl implements UserService {
         if (session != null) {
             if (session.getAttribute("userId") != null) {
                 // 사용자 조회
-                TblUser user = userRepository.findByUserId(session.getAttribute("userId").toString());
-                if (user == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
 
-                // 조회 결과 리턴
-                return ApiResponse.SUCCESS(
-                        SuccessCode.FOUND_IT,
-                        UserResponseDto.searchUserInfo.builder()
-                                .userSeq(user.getUserSeq())
-                                .userId(user.getUserId())
-                                .userName(user.getUserName())
-                                .userBirth(user.getUserBirth())
-                                .userPhone(user.getUserPhone())
-                                .userImg(user.getUserImg())
-                                .codeMbti(user.getCodeMbti().getCodeName())
-                                .build()
-                );
+                if (user.isPresent()) {
+                    log.info("회원정보 조회 완료, 사용자 ID {}", user.get().getUserId());
+
+                    // 조회 결과 리턴
+                    return ApiResponse.SUCCESS(
+                            SuccessCode.FOUND_IT,
+                            UserResponseDto.searchUserInfo.builder()
+                                    .userSeq(user.get().getUserSeq())
+                                    .userId(user.get().getUserId())
+                                    .userName(user.get().getUserName())
+                                    .userBirth(user.get().getUserBirth())
+                                    .userPhone(user.get().getUserPhone())
+                                    .userImg(user.get().getUserImg())
+                                    .codeMbti(user.get().getCodeMbti().getCodeName())
+                                    .build()
+                    );
+                } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
             } else {
                 log.error("세션이 만료되었습니다.");
                 return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
@@ -196,6 +209,7 @@ public class UserServiceImpl implements UserService {
             if (session.getAttribute("userId") != null) {
                 // 사용자 조회
                 Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+
                 if (user.isPresent()) {
                     // 코드 값 조회
                     TblCode codeMbti = codeRepository.findByCodeSeq(Long.valueOf(updateUserInfo.getCodeMbti()));
