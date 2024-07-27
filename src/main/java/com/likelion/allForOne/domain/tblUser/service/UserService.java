@@ -18,4 +18,6 @@ public interface UserService {
     ApiResponse<?> searchUserInfo(HttpSession session); // 내 정보 조회
     
     ApiResponse<?> updateUserInfo(UpdateUserInfo updateUserInfo, HttpSession session); // 내 정보 수정
+    
+    ApiResponse<?> deleteUser(HttpSession session); // 회원 탈퇴
 }

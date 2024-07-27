@@ -240,4 +240,34 @@ public class UserServiceImpl implements UserService {
             return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
         }
     }
+
+    /**
+     * 회원 탈퇴
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> deleteUser(HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                // 사용자 조회
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+
+                if (user.isPresent()) {
+                    // 사용자 삭제
+                    userRepository.deleteById(user.get().getUserSeq());
+                    
+                    log.info("회원 탈퇴 완료, 사용자 ID {}", session.getAttribute("userId"));
+                    return ApiResponse.SUCCESS(SuccessCode.DELETE_USER);
+                } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
 }
