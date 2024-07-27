@@ -42,5 +42,18 @@ public class UserRequestDto {
     public static class CheckPwdDto {
         private String userPwd;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateUserInfo {
+        private String userPwd;
+        private String userName;
+        private String userBirth;
+        private String userPhone;
+        private String userImg;
+        private String codeMbti;
+    }
 }
 

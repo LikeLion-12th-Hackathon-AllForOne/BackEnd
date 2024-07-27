@@ -2,6 +2,7 @@ package com.likelion.allForOne.domain.tblUser.service;
 
 import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
 import com.likelion.allForOne.domain.tblUser.TblUserRepository;
+import com.likelion.allForOne.domain.tblUser.dto.UserResponseDto;
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblUser;
 import com.likelion.allForOne.global.response.ApiResponse;
@@ -13,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.likelion.allForOne.domain.tblUser.dto.UserRequestDto.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,6 +34,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ApiResponse<?> join(JoinDto joinDto) {
         if (!joinDto.getCodeMbti().isEmpty()) {
+            // 코드 값 조회
             TblCode codeMbti = codeRepository.findByCodeSeq(Long.valueOf(joinDto.getCodeMbti()));
             if (codeMbti == null) return ApiResponse.ERROR(ErrorCode.CODE_NOT_FOUND);
 
@@ -132,6 +137,86 @@ public class UserServiceImpl implements UserService {
                     log.error("비밀번호가 일치하지 않습니다.");
                     return ApiResponse.ERROR(ErrorCode.PASSWORD_INCORRECT);
                 }
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
+
+    /**
+     * 내 정보 조회
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> searchUserInfo(HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                // 사용자 조회
+                TblUser user = userRepository.findByUserId(session.getAttribute("userId").toString());
+                if (user == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+
+                // 조회 결과 리턴
+                return ApiResponse.SUCCESS(
+                        SuccessCode.FOUND_IT,
+                        UserResponseDto.searchUserInfo.builder()
+                                .userSeq(user.getUserSeq())
+                                .userId(user.getUserId())
+                                .userName(user.getUserName())
+                                .userBirth(user.getUserBirth())
+                                .userPhone(user.getUserPhone())
+                                .userImg(user.getUserImg())
+                                .codeMbti(user.getCodeMbti().getCodeName())
+                                .build()
+                );
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
+
+    /**
+     * 내 정보 수정
+     * @param updateUserInfo
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> updateUserInfo(@RequestBody UpdateUserInfo updateUserInfo, HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                // 사용자 조회
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+                if (user.isPresent()) {
+                    // 코드 값 조회
+                    TblCode codeMbti = codeRepository.findByCodeSeq(Long.valueOf(updateUserInfo.getCodeMbti()));
+                    if (codeMbti == null) return ApiResponse.ERROR(ErrorCode.CODE_NOT_FOUND);
+
+                    // 변경된 사용자 정보 수정
+                    TblUser updateUser = TblUser.builder()
+                            .userSeq(user.get().getUserSeq())
+                            .userId(user.get().getUserId())
+                            .userPwd(updateUserInfo.getUserPwd())
+                            .userName(updateUserInfo.getUserName())
+                            .userBirth(updateUserInfo.getUserBirth())
+                            .userPhone(updateUserInfo.getUserPhone())
+                            .userImg(updateUserInfo.getUserImg())
+                            .codeMbti(codeMbti)
+                            .build();
+                    userRepository.save(updateUser);
+
+                    log.info("회원정보 수정 완료, 사용자 ID {}", user.get().getUserId());
+                    return ApiResponse.SUCCESS(SuccessCode.UPDATE_USER_INFO);
+                } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
             } else {
                 log.error("세션이 만료되었습니다.");
                 return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
