@@ -51,4 +51,10 @@ public class UserController {
     public ResponseEntity<?> searchUserInfo(HttpSession session) {
         return ResponseEntity.ok().body(userService.searchUserInfo(session));
     }
+
+    // 내 정보 수정
+    @PostMapping("/api/user/updateUserInfo")
+    public ResponseEntity<?> updateUserInfo(@RequestBody UpdateUserInfo updateUserInfo, HttpSession session) {
+        return ResponseEntity.ok().body(userService.updateUserInfo(updateUserInfo, session));
+    }
 }
