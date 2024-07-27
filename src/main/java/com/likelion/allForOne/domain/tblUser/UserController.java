@@ -57,4 +57,10 @@ public class UserController {
     public ResponseEntity<?> updateUserInfo(@RequestBody UpdateUserInfo updateUserInfo, HttpSession session) {
         return ResponseEntity.ok().body(userService.updateUserInfo(updateUserInfo, session));
     }
+
+    // 회원 탈퇴
+    @DeleteMapping("/api/user/deleteUser")
+    public ResponseEntity<?> deleteUser(HttpSession session) {
+        return ResponseEntity.ok().body(userService.deleteUser(session));
+    }
 }
