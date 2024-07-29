@@ -36,11 +36,11 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comTarget', 2, now() from tbl_code c where c.code_name = 'questionType';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'addTarget', 3, now() from tbl_code c where c.code_name = 'questionType';
 -- questionClass
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'family', 1, now() from tbl_code c where c.code_name = 'questionClass';
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'parents', 2, now() from tbl_code c where c.code_name = 'questionClass';
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'child', 3, now() from tbl_code c where c.code_name = 'questionClass';
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'friend', 4, now() from tbl_code c where c.code_name = 'questionClass';
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'couple', 5, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'family', (select c.code_seq from tbl_code c where c.code_unit = 2 and c.code_name = '가족') as code_val, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'parents', (select c.code_seq from tbl_code c where c.code_unit = 2 and c.code_name = '가족') as code_val, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'child', (select c.code_seq from tbl_code c where c.code_unit = 2 and c.code_name = '가족') as code_val, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'friend', (select c.code_seq from tbl_code c where c.code_unit = 2 and c.code_name = '친구') as code_val, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'couple', (select c.code_seq from tbl_code c where c.code_unit = 2 and c.code_name = '연인') as code_val, now() from tbl_code c where c.code_name = 'questionClass';
 -- package
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '확인', 1, now() from tbl_code c where c.code_name = 'package';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '미확인', 2, now() from tbl_code c where c.code_name = 'package';
