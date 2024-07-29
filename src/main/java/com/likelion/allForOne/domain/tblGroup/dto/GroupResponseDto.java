@@ -1,7 +1,7 @@
 package com.likelion.allForOne.domain.tblGroup.dto;
 
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
-import com.likelion.allForOne.domain.tblQuestion.QuestionDto;
+import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -7,8 +7,8 @@ import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
 import com.likelion.allForOne.domain.tblLetterPackage.LetterPackageServiceImpl;
-import com.likelion.allForOne.domain.tblQuestion.QuestionDto;
-import com.likelion.allForOne.domain.tblUser.UserRepository;
+import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
+import com.likelion.allForOne.domain.tblUser.TblUserRepository;
 import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.CustomException;
@@ -30,7 +30,7 @@ import java.util.Random;
 @AllArgsConstructor
 @Transactional(readOnly = true)
 public class GroupServiceImpl implements GroupService {
-    private final UserRepository userRepository;
+    private final TblUserRepository userRepository;
     private final TblGroupRepository groupRepository;
 
     private final CodeServiceImpl codeService;
