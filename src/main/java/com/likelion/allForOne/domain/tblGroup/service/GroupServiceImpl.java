@@ -163,7 +163,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public ApiResponse<?> saveGroupMemberByInviteCode(GroupRequestDto.saveGroupMemberByInviteCode data, Long userSeq) {
-        //1. 로그인 사용자 정보 확인 (수정필요)
+        //1. 로그인 사용자 정보 확인
         Optional<TblUser> userOpt = userRepository.findById(userSeq);
         if (userOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
