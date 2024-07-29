@@ -27,9 +27,13 @@ public class TblUsedQuestion {
 
 
     @ManyToOne
-    @Comment(value="질문 코드 구분자")
-    @JoinColumn(name = "code_question", nullable = false)
-    private TblCode codeQuestion;           //질문코드 구분자
+    @Comment(value="질문유형 코드 구분자")
+    @JoinColumn(name = "code_question_type", nullable = false)
+    private TblCode codeQuestionType;           //질문유형 코드 구분자
+    @ManyToOne
+    @Comment(value="질문구분 코드 구분자")
+    @JoinColumn(name = "code_question_class", nullable = false)
+    private TblCode codeQuestionClass;           //질문구분 코드 구분자
 
     @ManyToOne
     @Comment(value="공통질문 구분자")

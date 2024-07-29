@@ -2,7 +2,8 @@
 insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'mbti', 0, now());
 insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'category', 0, now());
 insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'paper', 0, now());
-insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'question', 0, now());
+insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'questionType', 0, now());
+insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'questionClass', 0, now());
 insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'package', 0, now());
 
 -- tbl_code 2분류 초기화
@@ -30,15 +31,44 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 -- paper
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '무료', 1, now() from tbl_code c where c.code_name = 'paper';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '유료', 2, now() from tbl_code c where c.code_name = 'paper';
--- question
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comTarget', 1, now() from tbl_code c where c.code_name = 'question';
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comAll', 2, now() from tbl_code c where c.code_name = 'question';
-insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'addTarget', 3, now() from tbl_code c where c.code_name = 'question';
+-- questionType
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comAll', 1, now() from tbl_code c where c.code_name = 'questionType';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'comTarget', 2, now() from tbl_code c where c.code_name = 'questionType';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'addTarget', 3, now() from tbl_code c where c.code_name = 'questionType';
+-- questionClass
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'family', 1, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'parents', 2, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'child', 3, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'friend', 4, now() from tbl_code c where c.code_name = 'questionClass';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, 'couple', 5, now() from tbl_code c where c.code_name = 'questionClass';
 -- package
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '확인', 1, now() from tbl_code c where c.code_name = 'package';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '미확인', 2, now() from tbl_code c where c.code_name = 'package';
 
+-- tbl_code 3분류 초기화
+-- category
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '아빠', 1, now() from tbl_code c where c.code_unit = 2 and c.code_name = '가족';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '엄마', 2, now() from tbl_code c where c.code_unit = 2 and c.code_name = '가족';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '자녀', 3, now() from tbl_code c where c.code_unit = 2 and c.code_name = '가족';
 
--- admin user
+
+-- test data zip
+-- user
 insert into tbl_user (code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
     values ( 6, now(), '20000123', 'admin', 'imgfile.jpg', '관리자', '01011111111', 'admin1234');
+insert into tbl_user ( code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 7, now(), '20000124', 'family1', 'imgfile.jpg', '부모', '01022222222', 'family1');
+insert into tbl_user ( code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 7, now(), '20000125', 'family2', 'imgfile.jpg', '자식', '01033333333', 'family2');
+insert into tbl_user (code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 8, now(), '20000126', 'friend1', 'imgfile.jpg', '친구1', '01044444444', 'friend1');
+insert into tbl_user (code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 8, now(), '20000127', 'friend2', 'imgfile.jpg', '친구2', '01055555555', 'friend2');
+insert into tbl_user (code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 8, now(), '20000128', 'friend3', 'imgfile.jpg', '친구3', '01066666666', 'friend3');
+insert into tbl_user ( code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
+    values ( 9, now(), '20000129', 'couple', 'imgfile.jpg', '애인', '01077777777', 'couple');
+
+
+
+

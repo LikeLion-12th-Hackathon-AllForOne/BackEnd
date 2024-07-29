@@ -22,9 +22,9 @@ public class TblAddQuestion extends BaseEntity {
     private String addQuestion;             //질문 내용
 
     @ManyToOne
-    @Comment(value="질문 코드 구분자")
-    @JoinColumn(name = "code_question", nullable = false)
-    private TblCode codeQuestion;           //질문 코드 구분자
+    @Comment(value="질문구분 코드 구분자")
+    @JoinColumn(name = "code_question_class", nullable = false)
+    private TblCode codeQuestionClass;           //질문구분 코드 구분자
 
     @Comment(value="질문 생성자 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
