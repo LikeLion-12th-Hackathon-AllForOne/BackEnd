@@ -2,6 +2,8 @@ package com.likelion.allForOne.domain.tblGroup;
 
 import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.domain.tblGroup.service.GroupServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/group")
 public class GroupController {
     private final GroupServiceImpl groupService;
-//    private final HttpServletRequest request;
+    private final HttpServletRequest request;
 
     /**
      * 방(그룹) 생성
@@ -20,9 +22,9 @@ public class GroupController {
      */
     @PostMapping("/create")
     public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data){
-//        HttpSession session = request.getSession(false);
-//        Long userSeq = (Long) session.getAttribute("userSeq");
-        Long userSeq = 1L;
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+//        Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.saveOneGroup(data, userSeq));
     }
 
@@ -32,9 +34,9 @@ public class GroupController {
      */
     @GetMapping("/findList/joinGroup")
     public ResponseEntity<?> findListJoinGroup(){
-//        HttpSession session = request.getSession(false);
-//        Long userSeq = (Long) session.getAttribute("userSeq");
-        Long userSeq = 1L;
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+//        Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.findListJoinGroup(userSeq));
     }
 
@@ -45,9 +47,9 @@ public class GroupController {
      */
     @GetMapping("/{groupSeq}/findInviteCode")
     public ResponseEntity<?> findGroupInviteCode(@PathVariable("groupSeq") Long groupSeq){
-//        HttpSession session = request.getSession(false);
-//        Long userSeq = (Long) session.getAttribute("userSeq");
-        Long userSeq = 1L;
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+//        Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.findGroupInviteCode(groupSeq, userSeq));
     }
 
@@ -58,9 +60,9 @@ public class GroupController {
      */
     @PostMapping("/join")
     public ResponseEntity<?> saveGroupMemberByInviteCode(@RequestBody GroupRequestDto.saveGroupMemberByInviteCode data) {
-//        HttpSession session = request.getSession(false);
-//        Long userSeq = (Long) session.getAttribute("userSeq");
-        Long userSeq = 2L;
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+//        Long userSeq = 2L;
         return ResponseEntity.ok().body(groupService.saveGroupMemberByInviteCode(data, userSeq));
     }
 
@@ -71,9 +73,9 @@ public class GroupController {
      */
     @GetMapping("/{groupSeq}/findDetails")
     public ResponseEntity<?> findGroupDetail(@PathVariable("groupSeq") Long groupSeq){
-//        HttpSession session = request.getSession(false);
-//        Long userSeq = (Long) session.getAttribute("userSeq");
-        Long userSeq = 1L;
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+//        Long userSeq = 1L;
 //        Long userSeq = 2L;
         return ResponseEntity.ok().body(groupService.findGroupDetail(groupSeq, userSeq));
     }

@@ -46,7 +46,7 @@ public class GroupMemberServiceImpl {
      * @return List<TblGroupMember>:특정 사용자의 그룹회원 리스트
      */
     public List<TblGroupMember> findListGroupMemberByGroup(Long groupSeq){
-        return groupMemberRepository.findByUser_UserSeq(groupSeq);
+        return groupMemberRepository.findByGroup_GroupSeq(groupSeq);
     }
 
     /**

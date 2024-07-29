@@ -200,6 +200,9 @@ public class GroupServiceImpl implements GroupService {
         Optional<TblUser> userOpt = userRepository.findById(userSeq);
         if (userOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
+        //2. groupSeq & userSeq 사용해서 그룹멤버인지 확인
+        if (!groupMemberService.checkGroupMember(groupSeq, userSeq)) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
+
         //2. groupSeq 사용해서 그룹 정보 조회
         Optional<TblGroup> groupOpt = groupRepository.findById(groupSeq);
         if(groupOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
@@ -211,7 +214,7 @@ public class GroupServiceImpl implements GroupService {
         //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업) (수정필요)
         TblUsedQuestion question = null;
 
-        //5. 그룹멤버 프로필 조회
+        //5. 그룹멤버 프로필 조회 (수정필요)
         List<GroupMemberDto.profile> profileList = new ArrayList<>();
         List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
         for(TblGroupMember entity : groupMemberList){
@@ -255,6 +258,14 @@ public class GroupServiceImpl implements GroupService {
             sb.append(characters.charAt(index));
         }
         return sb.toString();
+    }
+
+    /**
+     * 전체 그룹 조회
+     * @return List<TblGroup>:전체그룹
+     */
+    public List<TblGroup> findListAllGroup(){
+        return groupRepository.findAll();
     }
 
 }
