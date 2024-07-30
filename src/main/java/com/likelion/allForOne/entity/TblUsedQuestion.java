@@ -39,8 +39,8 @@ public class TblUsedQuestion {
     @JoinColumn(name = "com_question_seq")
     private TblComQuestion comQuestionSeq;  //공통질문 구분자
 
-    @Comment(value="질문 생성자 구분자")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @Comment(value="추가질문 구분자")
     @JoinColumn(name = "add_question_seq")
     private TblAddQuestion addQuestionSeq;  //추가질문 구분자
 

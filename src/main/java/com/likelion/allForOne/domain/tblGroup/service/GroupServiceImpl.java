@@ -221,8 +221,8 @@ public class GroupServiceImpl implements GroupService {
         //3. 편지보따리 달성도 조회
         int achievePercent = letterPackageService.packageAchievePercent(groupSeq);
 
-        //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업) (수정필요)
-        TblUsedQuestion question = null;
+        //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업)
+        QuestionDto.todayQuestion question = questionService.findTodayQuestion(group);
 
         //5. 그룹멤버 프로필 조회 (수정필요)
         List<GroupMemberDto.profile> profileList = new ArrayList<>();
@@ -243,10 +243,7 @@ public class GroupServiceImpl implements GroupService {
                 .groupName(group.getGroupName())
                 .dayAfterCnt(group.getCreateDate().toLocalDate().until(LocalDate.now(), ChronoUnit.DAYS)+1)
                 .achievePercent(achievePercent)
-                .todayQuiz(QuestionDto.todayQuiz.builder()
-                        .usedQuestionSeq(null)
-                        .question("일단 마음대로 질문 넣어높고 질문 파트 완료되면 구현 넣어야지.")
-                        .build())
+                .todayQuiz(question)
                 .groupMemberList(profileList)
                 .build();
 

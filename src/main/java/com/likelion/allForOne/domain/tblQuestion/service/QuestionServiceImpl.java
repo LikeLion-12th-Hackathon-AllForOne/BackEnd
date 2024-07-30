@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -44,10 +43,6 @@ public class QuestionServiceImpl implements QuestionService {
         } else {
             //4. questionOpt 데이터로 오늘의 질문 생성
             Object[] todayQuestion = (Object[]) result[0];
-            System.out.println(todayQuestion[0] != null ? ((Number) todayQuestion[0]).longValue() : null);
-            System.out.println(todayQuestion[1] != null ? ((Number) todayQuestion[1]).longValue() : null);
-
-
             TblUsedQuestion usedQuestion = TblUsedQuestion.builder()
                     .addQuestionSeq(todayQuestion[0] == null ? null : TblAddQuestion.builder().addQuestionSeq(((Number)todayQuestion[0]).longValue()).build())
                     .comQuestionSeq(todayQuestion[1] == null ? null : TblComQuestion.builder().comQuestionSeq(((Number)todayQuestion[1]).longValue()).build())
@@ -64,4 +59,56 @@ public class QuestionServiceImpl implements QuestionService {
             groupEntity.updateQuestionState(codeEntity);
         }
     }
+
+    /**
+     * 오늘의 퀴즈 조회
+     * @param groupEntity Long:방(그룹) 엔티티
+     * @return QuestionDto.todayQuestion
+     */
+    @Override
+    public QuestionDto.todayQuestion findTodayQuestion(TblGroup groupEntity) {
+        //1. 오늘의 퀴즈 상태에 따른 반환
+        int todayQuestionState = groupEntity.getCodeQuestionStateSeq().getCodeVal();
+        if (groupEntity.getCodeQuestionStateSeq().getCodeVal() != 1)
+            return QuestionDto.todayQuestion.builder()
+                    .questionStateVal(todayQuestionState)
+                    .questionStateMsg(groupEntity.getCodeQuestionStateSeq().getCodeName())
+                    .build();
+
+        //2. groupSeq 와 inpDate 가 오늘의 usedQuestion 데이터 조회
+        Object[] todayQuestionOpt = usedQuestionRepository.findByInpDateAndGroup_GroupSeq(groupEntity.getGroupSeq());
+        if (todayQuestionOpt.length == 0)
+            return QuestionDto.todayQuestion.builder()
+                    .questionStateVal(4)
+                    .questionStateMsg("문제출제를 기다리는 중입니다.")
+                    .build();
+
+        //3. 데이터 반환
+        Object[] todayQuestion = (Object[]) todayQuestionOpt[0];
+        return QuestionDto.todayQuestion.builder()
+                .questionStateVal(todayQuestionState)
+                .questionStateMsg(groupEntity.getCodeQuestionStateSeq().getCodeName())
+                .questionType(((Number)todayQuestion[1]).intValue() == 1 ? 1 : 2) // 1: 전체 질문 / 2: 개별질문
+                .usedQuestionSeq(((Number)todayQuestion[0]).longValue())
+                .question((String)todayQuestion[2] + (String)todayQuestion[3])
+                .build();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
