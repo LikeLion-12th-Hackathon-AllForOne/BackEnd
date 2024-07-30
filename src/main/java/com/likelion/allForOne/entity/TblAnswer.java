@@ -20,6 +20,8 @@ public class TblAnswer extends BaseEntity {
     private Long answerSeq;         //구분자
     @Column(columnDefinition = "varchar(500) null comment '답변'")
     private String answerContents;  //답변
+    @Column(columnDefinition = "tinyint not null comment '임시저장 여부'")
+    private int answerTmpYn;  //임시저장 여부(저장:0 / 임시저장:1)
 
 
     @Comment(value="질문 구분자")

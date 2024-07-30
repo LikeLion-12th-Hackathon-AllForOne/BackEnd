@@ -53,6 +53,13 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '친구', 1, now() from tbl_code c where c.code_unit = 2 and c.code_name = '친구';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '연인', 1, now() from tbl_code c where c.code_unit = 2 and c.code_name = '연인';
 
+-- 추가 - questionState
+insert into tbl_code (code_unit, code_name, code_val, create_date) values (1, 'questionState', 0, now());
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '오늘의 문제가 출제되었습니다.', 1, now() from tbl_code c where c.code_name = 'questionState';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '모든 문제가 출제되어 출제 가능한 문제가 없습니다.', 2, now() from tbl_code c where c.code_name = 'questionState';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '인원수가 채워지지 않아 문제를 출제할 수 없습니다.', 3, now() from tbl_code c where c.code_name = 'questionState';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 2, '문제출제를 기다리는 중입니다.', 4, now() from tbl_code c where c.code_name = 'questionState';
+
 
 -- test data zip
 -- user

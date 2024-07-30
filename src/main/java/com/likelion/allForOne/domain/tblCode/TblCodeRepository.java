@@ -11,4 +11,5 @@ public interface TblCodeRepository extends JpaRepository<TblCode, Long> {
     Optional<TblCode> findByCodeUnitAndCodeParent_CodeSeq(int codeUnit, long parentCodeSeq);
     List<TblCode> findByCodeParent_CodeSeq(Long codeParentSeq);
     TblCode findByCodeSeq(Long codeSeq);
+    Optional<TblCode> findByCodeValAndCodeParent_CodeSeq(int codeVal, long parentCodeSeq);
 }

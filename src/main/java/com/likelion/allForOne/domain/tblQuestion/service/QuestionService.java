@@ -3,8 +3,10 @@ package com.likelion.allForOne.domain.tblQuestion.service;
 import com.likelion.allForOne.entity.TblGroup;
 import com.likelion.allForOne.global.response.ApiResponse;
 
+import java.time.LocalDate;
+
 public interface QuestionService {
-    void createTodayQuestion(TblGroup entity);  //오늘의 질문 생성하기
+    void createTodayQuestion(LocalDate inpDate, TblGroup entity);  //오늘의 질문 생성하기
     //오늘의 질문 조회하기
     //질문 추가하기
     //답변 임시저장

@@ -32,8 +32,21 @@ public class TblGroup extends BaseEntity {
     private TblCode codeCategory;   //카테고리 구분자
 
     @ManyToOne
+    @Comment(value="오늘의 퀴즈 상태 구분자")
+    @JoinColumn(name = "code_question_state_seq")
+    private TblCode codeQuestionStateSeq;   //오늘의 퀴즈 상태 구분자
+
+    @ManyToOne
     @Comment(value="방장 사용자 구분자")
     @JoinColumn(name = "user_owner", nullable = false)
     private TblUser userOwner;      //방장 사용자 구분자
+
+    /* ============================================================================
+     * update
+     * ============================================================================ */
+    // 오늘의 퀴즈 상태 구분자 변경
+    public void updateQuestionState(TblCode codeQuestionState){
+        this.codeQuestionStateSeq = codeQuestionState;
+    }
 
 }

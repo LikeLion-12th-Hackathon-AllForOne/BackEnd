@@ -8,6 +8,7 @@ import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
 import com.likelion.allForOne.domain.tblLetterPackage.LetterPackageServiceImpl;
 import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
+import com.likelion.allForOne.domain.tblQuestion.service.QuestionServiceImpl;
 import com.likelion.allForOne.domain.tblUser.TblUserRepository;
 import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
@@ -36,6 +37,7 @@ public class GroupServiceImpl implements GroupService {
     private final CodeServiceImpl codeService;
     private final LetterPackageServiceImpl letterPackageService;
     private final GroupMemberServiceImpl groupMemberService;
+    private final QuestionServiceImpl questionService;
 
     /**
      * 방(그룹) 생성
@@ -54,8 +56,8 @@ public class GroupServiceImpl implements GroupService {
         boolean codeValidation = codeService.codeValidationCheck("category", data.getCodeCategorySeq());
         if (!codeValidation) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
 
-        //3. 인원수 1이상 6이하
-        if (data.getGroupMemberCnt() < 1 || data.getGroupMemberCnt() > 6)
+        //3. 인원수 2이상 6이하
+        if (data.getGroupMemberCnt() < 2 || data.getGroupMemberCnt() > 6)
             return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
 
         //4. 사용자의 프리미엄 구독 여부에 따라 참가한 방(그룹)이 1개를 넘지 못함. (해당 부분은 추후 개발 예정)
@@ -69,11 +71,13 @@ public class GroupServiceImpl implements GroupService {
         }
 
         //6. 방(그룹) 생성
+        TblCode codeEntity = codeService.findCodeByCodeVal(1, "questionState", 3);
         TblGroup entity = TblGroup.builder()
                 .groupMemberCnt(data.getGroupMemberCnt())
                 .groupName(data.getGroupName())
                 .groupInviteCode(inviteCode)
                 .codeCategory(TblCode.builder().codeSeq(data.getCodeCategorySeq()).build())
+                .codeQuestionStateSeq(codeEntity)
                 .userOwner(userOpt.get())
                 .build();
         TblGroup tblGroup = groupRepository.save(entity);
@@ -184,7 +188,13 @@ public class GroupServiceImpl implements GroupService {
         Long memberSeq = groupMemberService.saveGroupMember(joinGroup, userOpt.get());
         if(memberSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
 
-        //6. 결과 반환
+        //6. 그룹 인원이 전부 채워진 경우, 문제 출제
+        if (cntJoinMember+1 == joinGroup.getGroupMemberCnt()) {
+            TblCode codeEntity = codeService.findCodeByCodeVal(1, "questionState", 4);
+            joinGroup.updateQuestionState(codeEntity);
+        }
+
+        //7. 결과 반환
         return ApiResponse.SUCCESS(SuccessCode.JOIN_MEMBER);
     }
 

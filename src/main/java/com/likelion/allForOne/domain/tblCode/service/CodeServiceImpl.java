@@ -113,7 +113,20 @@ public class CodeServiceImpl implements CodeService {
         return codeRepository.findById(codeSeq).orElse(null);
     }
 
+    /**
+     * parentUnit&parentName 과 codeVal 로 코드 구하기
+     * @param parentUnit int: 부모코드 분류
+     * @param parentCodeName String: 부모 코드 명
+     * @param codeVal Long: 코드 값
+     * @return TblCode:code entity
+     */
+    public TblCode findCodeByCodeVal(int parentUnit, String parentCodeName, int codeVal){
+        Optional<TblCode> parentCode = codeRepository.findByCodeUnitAndCodeName(parentUnit, parentCodeName);
 
+        return parentCode
+                .flatMap(tblCode -> codeRepository.findByCodeValAndCodeParent_CodeSeq(codeVal, tblCode.getCodeSeq()))
+                .orElse(null);
+    }
 
 
 }
