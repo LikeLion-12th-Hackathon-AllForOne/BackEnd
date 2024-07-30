@@ -1,5 +1,6 @@
 package com.likelion.allForOne.domain.tblGroupMember;
 
+import com.likelion.allForOne.domain.tblCode.service.CodeServiceImpl;
 import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblGroup;
 import com.likelion.allForOne.entity.TblGroupMember;
@@ -15,15 +16,21 @@ import java.util.Optional;
 public class GroupMemberServiceImpl {
     private final TblGroupMemberRepository groupMemberRepository;
 
+    private final CodeServiceImpl codeService;
+
     /**
      * 그룹 참가 회원 튜플 생성
      * @param group TblGroup:생성될 회원이 참가하고 있는 그룹 정보
      * @return Long:생성된 튜플의 구분자
      */
     public Long saveGroupMember(TblGroup group, TblUser user){
+        TblCode code = group.getCodeCategory();
         TblGroupMember groupMember = TblGroupMember.builder()
                 .group(group)
                 .user(user)
+                .codeCategoryRole(
+                        "가족".equals(code.getCodeName()) ? null
+                                : codeService.findCodeByUnitAndParentCode(3, code.getCodeSeq()))
                 .codePackage(TblCode.builder()
                         .codeSeq(30L)
                         .build()) //codeSeq: 30=확인, 31=미확인
@@ -67,5 +74,25 @@ public class GroupMemberServiceImpl {
      */
     public long cntJoinGroupMember(Long groupSeq){
         return groupMemberRepository.countByGroup_GroupSeq(groupSeq);
+    }
+
+    /**
+     * 사용자와 그룹으로 멤버 조회 및 역할 update
+     * @param groupSeq Long: 그룹 구분자
+     * @param userSeq Long: 사용자 구분자
+     * @return boolean
+     */
+    public boolean updateRole(Long groupSeq, Long userSeq, Long codeCategoryRoleSeq){
+        //1. 사용자와 그룹으로 멤버 조회
+        Optional<TblGroupMember> memberOpt = groupMemberRepository.findByGroup_GroupSeqAndUser_UserSeq(groupSeq, userSeq);
+        if (memberOpt.isEmpty()) return false;
+
+        //2. 역할 update
+        TblCode codeEntity = codeService.findCodes(codeCategoryRoleSeq);
+        if (codeEntity == null) return false;
+
+        TblGroupMember memberEntity = memberOpt.get();
+        memberEntity.updateRole(codeEntity);
+        return true;
     }
 }

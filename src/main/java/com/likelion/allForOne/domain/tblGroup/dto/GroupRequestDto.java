@@ -18,4 +18,9 @@ public class GroupRequestDto {
     public static class findGroupDetail {
         private Long groupSeq;
     }
+    @Data
+    public static class updateRole {
+        private Long groupSeq;
+        private Long codeCategoryRoleSeq;
+    }
 }

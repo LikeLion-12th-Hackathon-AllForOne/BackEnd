@@ -24,7 +24,6 @@ public class GroupController {
     public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data){
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
-//        Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.saveOneGroup(data, userSeq));
     }
 
@@ -36,7 +35,6 @@ public class GroupController {
     public ResponseEntity<?> findListJoinGroup(){
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
-//        Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.findListJoinGroup(userSeq));
     }
 
@@ -49,7 +47,6 @@ public class GroupController {
     public ResponseEntity<?> findGroupInviteCode(@PathVariable("groupSeq") Long groupSeq){
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
-//        Long userSeq = 1L;
         return ResponseEntity.ok().body(groupService.findGroupInviteCode(groupSeq, userSeq));
     }
 
@@ -62,7 +59,6 @@ public class GroupController {
     public ResponseEntity<?> saveGroupMemberByInviteCode(@RequestBody GroupRequestDto.saveGroupMemberByInviteCode data) {
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
-//        Long userSeq = 2L;
         return ResponseEntity.ok().body(groupService.saveGroupMemberByInviteCode(data, userSeq));
     }
 
@@ -75,8 +71,18 @@ public class GroupController {
     public ResponseEntity<?> findGroupDetail(@PathVariable("groupSeq") Long groupSeq){
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
-//        Long userSeq = 1L;
-//        Long userSeq = 2L;
         return ResponseEntity.ok().body(groupService.findGroupDetail(groupSeq, userSeq));
+    }
+
+    /**
+     * 가족그룹에서의 역할 update
+     * @param data GroupRequestDto.updateRole
+     * @return ResponseEntity<?>
+     */
+    @PostMapping("/updateRole")
+    public ResponseEntity<?> updateRole(@RequestBody GroupRequestDto.updateRole data) {
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(groupService.updateRole(data, userSeq));
     }
 }

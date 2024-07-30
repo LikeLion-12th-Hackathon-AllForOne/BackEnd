@@ -80,5 +80,26 @@ public class CodeServiceImpl implements CodeService {
         return parentName.equals(codeOpt.get().getCodeParent().getCodeName());
     }
 
+    /**
+     * codeUnit 과 부모코드로 코드 조화
+     * @param codUnit int:분류 단계
+     * @param parentCodeSeq long: 부모코드
+     * @return TblCode: code entity
+     */
+    public TblCode findCodeByUnitAndParentCode(int codUnit, long parentCodeSeq){
+        return codeRepository.findByCodeUnitAndCodeParent_CodeSeq(codUnit, parentCodeSeq).orElse(null);
+    }
+
+    /**
+     * codeSeq로 코드 조회
+     * @param codeSeq long: 코드 구분자
+     * @return TblCode:code entity
+     */
+    public TblCode findCodes(long codeSeq){
+        return codeRepository.findById(codeSeq).orElse(null);
+    }
+
+
+
 
 }

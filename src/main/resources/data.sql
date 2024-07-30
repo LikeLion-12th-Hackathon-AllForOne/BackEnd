@@ -50,6 +50,8 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '아빠', 1, now() from tbl_code c where c.code_unit = 2 and c.code_name = '가족';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '엄마', 2, now() from tbl_code c where c.code_unit = 2 and c.code_name = '가족';
 insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '자녀', 3, now() from tbl_code c where c.code_unit = 2 and c.code_name = '가족';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '친구', 1, now() from tbl_code c where c.code_unit = 2 and c.code_name = '친구';
+insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_date) select c.code_seq, 3, '연인', 1, now() from tbl_code c where c.code_unit = 2 and c.code_name = '연인';
 
 
 -- test data zip

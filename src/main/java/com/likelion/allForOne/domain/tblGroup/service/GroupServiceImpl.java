@@ -245,6 +245,28 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
+     * 가족그룹에서의 역할 update
+     * @param data GroupRequestDto.updateRole: update 관련 데이터
+     * @param userSeq Long:로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> updateRole(GroupRequestDto.updateRole data, Long userSeq) {
+        //1. 그룹 조회를 통해 가족 그룹인지 확인
+        Optional<TblGroup> groupOpt = groupRepository.findById(data.getGroupSeq());
+        if (groupOpt.isEmpty() || !"가족".equals(groupOpt.get().getCodeCategory().getCodeName()))
+            return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+
+        //2. 사용자와 그룹으로 멤버 조회 및 역할 update
+        boolean update = groupMemberService.updateRole(groupOpt.get().getGroupSeq(), userSeq, data.getCodeCategoryRoleSeq());
+
+        //3. 결과 반환
+        return update ? ApiResponse.SUCCESS(SuccessCode.UPDATE_USER_INFO)
+                : ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+    }
+
+    /**
      * 초대코드 생성
      * @return String:랜덤으로 생성된 초대코드
      */
