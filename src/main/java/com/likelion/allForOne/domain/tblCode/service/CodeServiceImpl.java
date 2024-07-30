@@ -29,26 +29,40 @@ public class CodeServiceImpl implements CodeService {
     @Override
     public ApiResponse<?> findListSelectList(String codeName) {
         // 1. 1분류 아래 2분류 리스트 조회
-        List<CodeDto.simple1> dtoList = findListUnit2(codeName);
+        List<CodeDto.simple1> dtoList = findListUnit(1, codeName);
 
         // 2. 데이터 여부에 따른 반환 값 조정
-        if (dtoList.isEmpty())
-            return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
-        else
-            return ApiResponse.SUCCESS(SuccessCode.FOUND_LIST, new CodeResponseDto.findListUnit2(dtoList));
+        return dtoList == null
+                ? ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND)
+                : ApiResponse.SUCCESS(SuccessCode.FOUND_LIST, new CodeResponseDto.findListUnit(dtoList));
     }
 
     /**
-     * 1분류 아래 2분류 리스트 조회
+     * 공통코드 가족 역할 select box 리스트 조회
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> findListFamilySelectList() {
+        // 1. 1분류 아래 2분류 리스트 조회
+        List<CodeDto.simple1> dtoList = findListUnit(2, "가족");
+
+        // 2. 데이터 여부에 따른 반환 값 조정
+        return dtoList == null
+                ? ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND)
+                : ApiResponse.SUCCESS(SuccessCode.FOUND_LIST, new CodeResponseDto.findListUnit(dtoList));
+    }
+
+    /**
+     * 상위분류 아래 하위분류 리스트 조회
      * @param codeName String:1분류 코드명
      * @return CodeDto.simple1
      */
-    public List<CodeDto.simple1> findListUnit2(String codeName) {
-        // 1. 1분류 중 해당 코드명을 갖고 있는 코드가 있는지 확인
-        Optional<TblCode> firstUnit = codeRepository.findByCodeUnitAndCodeName(1, codeName);
+    private List<CodeDto.simple1> findListUnit(int parentUnit, String codeName) {
+        // 1. 상위분류 중 해당 코드명을 갖고 있는 코드가 있는지 확인
+        Optional<TblCode> firstUnit = codeRepository.findByCodeUnitAndCodeName(parentUnit, codeName);
         if (firstUnit.isEmpty()) return null;
 
-        // 2. 1에서 존재하는 경우, 2분류 리스트 조회
+        // 2. 1에서 존재하는 경우, 하위 리스트 조회
         List<TblCode> secondUnitList = codeRepository.findByCodeParent_CodeSeq(firstUnit.get().getCodeSeq());
 
         // 3. 조회된 데이터 dto변환
