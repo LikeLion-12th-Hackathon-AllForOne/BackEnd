@@ -90,7 +90,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .questionStateMsg(groupEntity.getCodeQuestionStateSeq().getCodeName())
                 .questionType(((Number)todayQuestion[1]).intValue() == 1 ? 1 : 2) // 1: 전체 질문 / 2: 개별질문
                 .usedQuestionSeq(((Number)todayQuestion[0]).longValue())
-                .question((String)todayQuestion[2] + (String)todayQuestion[3])
+                .question((String)todayQuestion[2]+todayQuestion[3])
                 .build();
     }
 
