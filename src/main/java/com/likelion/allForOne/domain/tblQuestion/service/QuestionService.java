@@ -1,6 +1,7 @@
 package com.likelion.allForOne.domain.tblQuestion.service;
 
 import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
+import com.likelion.allForOne.domain.tblQuestion.dto.QuestionRequestDto;
 import com.likelion.allForOne.entity.TblGroup;
 import com.likelion.allForOne.global.response.ApiResponse;
 
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 public interface QuestionService {
     void createTodayQuestion(LocalDate inpDate, TblGroup entity);  //오늘의 질문 생성하기
     QuestionDto.todayQuestion findTodayQuestion(TblGroup groupEntity);  //오늘의 질문 조회하기
-    //질문 추가하기
+    ApiResponse<?> addQuestion(QuestionRequestDto.AddQuestion data, Long userSeq);  //질문 추가하기
     //답변 임시저장
     //답변 등록
     //지난 퀴즈 모아보기

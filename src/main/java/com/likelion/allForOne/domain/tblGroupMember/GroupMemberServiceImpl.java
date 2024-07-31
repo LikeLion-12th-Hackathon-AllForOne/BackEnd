@@ -95,4 +95,13 @@ public class GroupMemberServiceImpl {
         memberEntity.updateRole(codeEntity);
         return true;
     }
+
+    /**
+     * 멤버 구분자로 멤버조회
+     * @param memberSeq Long: 멤버 구분자
+     * @return TblGroupMember: 회원 엔티티
+     */
+    public TblGroupMember findByGroupMemberSeq(Long memberSeq){
+        return groupMemberRepository.findById(memberSeq).orElse(null);
+    }
 }
