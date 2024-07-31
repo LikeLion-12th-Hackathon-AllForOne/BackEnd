@@ -6,10 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -54,5 +51,18 @@ public class QuestionController {
         return ResponseEntity.ok().body(questionService.saveAnswer(0, data, userSeq));
     }
 
+    /**
+     * 오늘의 질문 답변(임시저장 or 저장)
+     * @param usedQuestionSeq Long: 오늘의 질문 구분자
+     * @param memberSeq Long: 멤버 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/today/question/{usedQuestionSeq}/answer/{memberSeq}")
+    public ResponseEntity<?> findTodayQandA(@PathVariable("usedQuestionSeq") Long usedQuestionSeq,
+                                            @PathVariable("memberSeq") Long memberSeq){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.findTodayQandA(usedQuestionSeq, memberSeq, userSeq));
+    }
 
 }

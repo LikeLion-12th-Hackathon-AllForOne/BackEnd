@@ -12,6 +12,7 @@ public interface QuestionService {
     QuestionDto.todayQuestion findTodayQuestion(TblGroup groupEntity);  //오늘의 질문 조회하기
     ApiResponse<?> addQuestion(QuestionRequestDto.AddQuestion data, Long userSeq);  //질문 추가하기
     ApiResponse<?> saveAnswer(int answerTmpYn, QuestionRequestDto.SaveAnswerList data, Long userSeq);  //답변 (임시)저장 : 임시저장 여부(저장:0 / 임시저장:1)
+    ApiResponse<?> findTodayQandA(Long usedQuestionSeq, Long memberSeq, Long userSeq);  //오늘의 질문 답변(임시저장 or 저장)
     //지난 퀴즈 모아보기
     //특정 그룹에서 특정인에 대한 퀴즈 모아보기
 }
