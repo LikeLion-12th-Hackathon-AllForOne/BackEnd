@@ -210,7 +210,7 @@ public class QuestionServiceImpl implements QuestionService {
                 || !memberAnswer.getGroup().getGroupSeq()
                     .equals(memberTarget.getGroup().getGroupSeq())) return 0;
 
-        //2. 이전에 임시저장한 기록이 있는지 확인(수정필요)
+        //2. 이전에 임시저장한 기록이 있는지 확인
         Optional<TblAnswer> bfAnswerOpt
                 = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
                         question.getUsedQuestionSeq(), memberAnswer.getMemberSeq(), memberTarget.getMemberSeq());   //답변자, 질문, 질문 대상자, 데이터로 기존에 있던 답변 데이터 확인
