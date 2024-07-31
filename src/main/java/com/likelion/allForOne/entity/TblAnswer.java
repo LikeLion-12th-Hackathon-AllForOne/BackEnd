@@ -27,7 +27,7 @@ public class TblAnswer extends BaseEntity {
     @Comment(value="질문 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "used_question_seq", nullable = false)
-    private TblUsedQuestion usedQuestionSeq;    //질문 구분자
+    private TblUsedQuestion usedQuestion;    //질문 구분자
 
     @Comment(value="답변 생성자 구분자")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,4 +38,15 @@ public class TblAnswer extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_target", nullable = false)
     private TblGroupMember memberTarget;        //질문 대상자 구분자
+
+
+    /* ============================================================================
+     * update
+     * ============================================================================ */
+    // 답변 내용 변경
+    public void updateAnswerContents(String answerContents, int answerTmpYn){
+        this.answerContents = answerContents;
+        this.answerTmpYn = answerTmpYn;
+    }
+
 }

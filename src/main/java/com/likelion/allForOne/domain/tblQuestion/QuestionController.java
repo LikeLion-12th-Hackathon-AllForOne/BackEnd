@@ -30,4 +30,29 @@ public class QuestionController {
         return ResponseEntity.ok().body(questionService.addQuestion(data, userSeq));
     }
 
+    /**
+     * 답변 임시저장
+     * @param data QuestionRequestDto.SaveAnswer
+     * @return ResponseEntity<?>
+     */
+    @PostMapping("/tempSave")
+    public ResponseEntity<?> tempSaveAnswer(@RequestBody QuestionRequestDto.SaveAnswerList data){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.saveAnswer(1, data, userSeq));
+    }
+
+    /**
+     * 답변 등록
+     * @param data QuestionRequestDto.SaveAnswer
+     * @return ResponseEntity<?>
+     */
+    @PostMapping("/save")
+    public ResponseEntity<?> saveAnswer(@RequestBody QuestionRequestDto.SaveAnswerList data){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.saveAnswer(0, data, userSeq));
+    }
+
+
 }

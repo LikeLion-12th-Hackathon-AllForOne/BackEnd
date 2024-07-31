@@ -3,9 +3,11 @@ package com.likelion.allForOne.domain.tblQuestion.service;
 
 import com.likelion.allForOne.domain.tblCode.service.CodeServiceImpl;
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
+import com.likelion.allForOne.domain.tblQuestion.dto.AnswerDto;
 import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
 import com.likelion.allForOne.domain.tblQuestion.dto.QuestionRequestDto;
 import com.likelion.allForOne.domain.tblQuestion.tblAddQuestion.TblAddQuestionRepository;
+import com.likelion.allForOne.domain.tblQuestion.tblAnswer.TblAnswerRepository;
 import com.likelion.allForOne.domain.tblQuestion.tblComQuestion.TblComQuestionRepository;
 import com.likelion.allForOne.domain.tblQuestion.tblUsedQuestion.TblUsedQuestionRepository;
 import com.likelion.allForOne.entity.*;
@@ -26,6 +28,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final TblAddQuestionRepository addQuestionRepository;
     private final TblComQuestionRepository comQuestionRepository;
     private final TblUsedQuestionRepository usedQuestionRepository;
+    private final TblAnswerRepository answerRepository;
 
     private final CodeServiceImpl codeService;
     private final GroupMemberServiceImpl groupMemberService;
@@ -57,7 +60,7 @@ public class QuestionServiceImpl implements QuestionService {
                     .codeQuestionClass(TblCode.builder().codeSeq(((Number)todayQuestion[3]).longValue()).build())
                     .memberTarget(todayQuestion[4] == null ? null : TblGroupMember.builder().memberSeq(((Number)todayQuestion[4]).longValue()).build())
                     .inpDate(inpDate)
-                    .groupSeq(groupEntity)
+                    .group(groupEntity)
                     .build();
             usedQuestionRepository.save(usedQuestion);
 
@@ -131,6 +134,55 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
+     * 답변 (임시)저장 : 임시저장 여부(저장:0 / 임시저장:1)
+     * @param data QuestionRequestDto.SaveAnswer: 입력받은 답변 데이터
+     * @param userSeq Long: 로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> saveAnswer(int answerTmpYn, QuestionRequestDto.SaveAnswerList data, Long userSeq) {
+        //1. 답변생성자와 로그인 사용자가 동일인이지 확인
+        TblGroupMember memberAnswer = groupMemberService.findByGroupMemberSeq(data.getMemberAnswerSeq());
+        if(memberAnswer == null
+                || !userSeq.equals(memberAnswer.getUser().getUserSeq()))
+            return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
+
+        //2. 질문 구분자로 질문 조회
+        Optional<TblUsedQuestion> questionOpt = usedQuestionRepository.findById(data.getQuestionSeq());
+        if(questionOpt.isEmpty()
+                || !questionOpt.get().getGroup().getGroupSeq().equals(memberAnswer.getGroup().getGroupSeq()))
+            return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+
+
+        //3. 질문 유형에 따라 답변 한개 또는 리스트 임시 저장
+        int successCnt = 0;
+        int saveLength = data.getSaveAnswerList().size();
+        TblUsedQuestion question = questionOpt.get();
+        if (question.getCodeQuestionType().getCodeSeq() == 28L) {
+            //4. 회원수이상의 답변 입력은 불가능함.
+            int possibleCnt = question.getGroup().getGroupMemberCnt()-1;
+            if (saveLength > possibleCnt) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+            //5. 답변 리스트 반영
+            for(AnswerDto.SaveAnswer saveData : data.getSaveAnswerList())
+                successCnt += answerReflect(answerTmpYn, memberAnswer, question, saveData);
+        } else {
+            //6. 답변 개수가 한개이고 입력받은 타겟멤버가 질문의 타겟멤버와 동일한지 확인
+            AnswerDto.SaveAnswer saveData = data.getSaveAnswerList().get(0);
+            if (saveLength > 1
+                    || !saveData.getMemberTargetSeq().equals(question.getMemberTarget().getMemberSeq()))
+                return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+            //7. 답변 한개 반영
+            successCnt += answerReflect(answerTmpYn, memberAnswer, question, saveData);
+        }
+
+        //8. 결과 반환
+        return successCnt == saveLength
+                ? ApiResponse.SUCCESS(SuccessCode.SAVE_ANSWER)
+                : ApiResponse.ERROR(ErrorCode.SAVE_SOME_FAIL);
+    }
+
+    /**
      * 멤버 역할 값으로 질문구분 코드 구분자(codeQuestionClass) 찾기
      * @param codeCategoryRoleSeq Long: 멤버 역할
      * @return Long: 질문구분 코드 구분자(codeQuestionClass)
@@ -141,6 +193,47 @@ public class QuestionServiceImpl implements QuestionService {
         else if (codeCategoryRoleSeq == 41L) return 34L;
         else if (codeCategoryRoleSeq == 42L) return 35L;
         else return null;
+    }
+
+    /**
+     * 질문 저장
+     * @param answerTmpYn int: 임시저장 여부(저장:0 / 임시저장:1)
+     * @param memberAnswer TblGroupMember: 답변하는 멤버 entity
+     * @param question TblUsedQuestion: 질문 entity
+     * @param saveData AnswerDto.SaveAnswer: 반영해야하는 답변
+     * @return int 성공여부(0:실패 / 1:성공)
+     */
+    private int answerReflect(int answerTmpYn, TblGroupMember memberAnswer, TblUsedQuestion question, AnswerDto.SaveAnswer saveData){
+        //1. 질문 대상자 유효성 검사
+        TblGroupMember memberTarget = groupMemberService.findByGroupMemberSeq(saveData.getMemberTargetSeq());
+        if(memberTarget == null
+                || !memberAnswer.getGroup().getGroupSeq()
+                    .equals(memberTarget.getGroup().getGroupSeq())) return 0;
+
+        //2. 이전에 임시저장한 기록이 있는지 확인(수정필요)
+        Optional<TblAnswer> bfAnswerOpt
+                = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
+                        question.getUsedQuestionSeq(), memberAnswer.getMemberSeq(), memberTarget.getMemberSeq());   //답변자, 질문, 질문 대상자, 데이터로 기존에 있던 답변 데이터 확인
+        if(bfAnswerOpt.isPresent()) {
+            //3. 저장된 기록과 일치하지 않는 정보에 대해 수정/저장을 진행하지 않음
+            TblAnswer bfAnswer = bfAnswerOpt.get();
+            if(!bfAnswer.getAnswerSeq().equals(saveData.getAnswerSeq())) return 0;
+
+            //4. 2에서 기록이 있을 경우, update
+            bfAnswer.updateAnswerContents(saveData.getAnswerContents(), answerTmpYn);
+            return 1;
+        }
+
+        //5. 2에서 기록이 없을 경우, save
+        TblAnswer answer = TblAnswer.builder()
+                .answerContents(saveData.getAnswerContents())
+                .answerTmpYn(answerTmpYn)
+                .usedQuestion(question)
+                .memberAnswer(memberAnswer)
+                .memberTarget(memberTarget)
+                .build();
+        answerRepository.save(answer);
+        return 1;
     }
 
 
