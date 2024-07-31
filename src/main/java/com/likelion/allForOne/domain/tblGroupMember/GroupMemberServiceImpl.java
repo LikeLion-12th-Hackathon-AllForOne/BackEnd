@@ -24,7 +24,7 @@ public class GroupMemberServiceImpl {
      * @return Long:생성된 튜플의 구분자
      */
     public Long saveGroupMember(TblGroup group, TblUser user){
-        TblCode code = group.getCodeCategory();
+        TblCode code = codeService.findCodes(group.getCodeCategory().getCodeSeq());
         TblGroupMember groupMember = TblGroupMember.builder()
                 .group(group)
                 .user(user)
