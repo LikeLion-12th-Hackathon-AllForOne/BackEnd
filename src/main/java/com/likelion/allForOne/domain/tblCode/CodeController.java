@@ -24,4 +24,13 @@ public class CodeController {
         return ResponseEntity.ok().body(codeService.findListSelectList(codeName));
     }
 
+    /**
+     * 공통코드 가족 역할 select box 리스트 조회
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/family/selectList")
+    public ResponseEntity<?> findListFamilySelectList(){
+        return ResponseEntity.ok().body(codeService.findListFamilySelectList());
+    }
+
 }

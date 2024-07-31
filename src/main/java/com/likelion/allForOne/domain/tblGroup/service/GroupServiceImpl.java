@@ -7,7 +7,9 @@ import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
 import com.likelion.allForOne.domain.tblLetterPackage.LetterPackageServiceImpl;
-import com.likelion.allForOne.domain.tblQuestion.QuestionDto;
+import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
+import com.likelion.allForOne.domain.tblQuestion.service.QuestionServiceImpl;
+import com.likelion.allForOne.domain.tblUser.TblUserRepository;
 import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.CustomException;
@@ -29,11 +31,13 @@ import java.util.Random;
 @AllArgsConstructor
 @Transactional(readOnly = true)
 public class GroupServiceImpl implements GroupService {
+    private final TblUserRepository userRepository;
     private final TblGroupRepository groupRepository;
 
     private final CodeServiceImpl codeService;
     private final LetterPackageServiceImpl letterPackageService;
     private final GroupMemberServiceImpl groupMemberService;
+    private final QuestionServiceImpl questionService;
 
     /**
      * 방(그룹) 생성
@@ -44,14 +48,16 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public ApiResponse<?> saveOneGroup(GroupRequestDto.saveOneGroup data, Long userSeq) {
-        //1. 유저 정보 확인 (로그인 기능 완료 후 추가) (수정필요)
+        //1. 유저 정보 확인 (로그인 기능 완료 후 추가)
+        Optional<TblUser> userOpt = userRepository.findById(userSeq);
+        if (userOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
         //2. 카테고리 코드 구분자 유효성 확인
         boolean codeValidation = codeService.codeValidationCheck("category", data.getCodeCategorySeq());
         if (!codeValidation) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
 
-        //3. 인원수 1이상 6이하
-        if (data.getGroupMemberCnt() < 1 || data.getGroupMemberCnt() > 6)
+        //3. 인원수 2이상 6이하
+        if (data.getGroupMemberCnt() < 2 || data.getGroupMemberCnt() > 6)
             return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
 
         //4. 사용자의 프리미엄 구독 여부에 따라 참가한 방(그룹)이 1개를 넘지 못함. (해당 부분은 추후 개발 예정)
@@ -65,12 +71,14 @@ public class GroupServiceImpl implements GroupService {
         }
 
         //6. 방(그룹) 생성
+        TblCode codeEntity = codeService.findCodeByCodeVal(1, "questionState", 3);
         TblGroup entity = TblGroup.builder()
                 .groupMemberCnt(data.getGroupMemberCnt())
                 .groupName(data.getGroupName())
                 .groupInviteCode(inviteCode)
                 .codeCategory(TblCode.builder().codeSeq(data.getCodeCategorySeq()).build())
-                .userOwner(TblUser.builder().userSeq(userSeq).build())
+                .codeQuestionStateSeq(codeEntity)
+                .userOwner(userOpt.get())
                 .build();
         TblGroup tblGroup = groupRepository.save(entity);
 
@@ -93,8 +101,9 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public ApiResponse<?> findListJoinGroup(Long userSeq) {
-        //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요. (수정필요)
-        TblUser user = TblUser.builder().userSeq(userSeq).build();
+        //1. 사용자 정보 조회 + 결과 값에 userImg, userName 값 변경 작업 필요.
+        Optional<TblUser> userOpt = userRepository.findById(userSeq);
+        if (userOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
         //2. 사용자가 참가하고 있는 방 리스트 찾기
         List<TblGroupMember> groupListEntity = groupMemberService.findListGroupMember(userSeq);
@@ -158,8 +167,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public ApiResponse<?> saveGroupMemberByInviteCode(GroupRequestDto.saveGroupMemberByInviteCode data, Long userSeq) {
-        //1. 로그인 사용자 정보 확인 (수정필요)
-        TblUser user = TblUser.builder().userSeq(userSeq).build();
+        //1. 로그인 사용자 정보 확인
+        Optional<TblUser> userOpt = userRepository.findById(userSeq);
+        if (userOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
         //2. 초대코드로 그룹 조회
         Optional<TblGroup> joinGroupOpt = groupRepository.findByGroupInviteCode(data.getGroupInviteCode());
@@ -175,10 +185,16 @@ public class GroupServiceImpl implements GroupService {
         if (cntJoinMember >= joinGroup.getGroupMemberCnt()) return ApiResponse.ERROR(ErrorCode.ALREADY_FULL);
 
         //5. 멤버 등록
-        Long memberSeq = groupMemberService.saveGroupMember(joinGroup, user);
+        Long memberSeq = groupMemberService.saveGroupMember(joinGroup, userOpt.get());
         if(memberSeq == null) throw new CustomException(ErrorCode.CREATE_FAIL);
 
-        //6. 결과 반환
+        //6. 그룹 인원이 전부 채워진 경우, 문제 출제
+        if (cntJoinMember+1 == joinGroup.getGroupMemberCnt()) {
+            TblCode codeEntity = codeService.findCodeByCodeVal(1, "questionState", 4);
+            joinGroup.updateQuestionState(codeEntity);
+        }
+
+        //7. 결과 반환
         return ApiResponse.SUCCESS(SuccessCode.JOIN_MEMBER);
     }
 
@@ -190,7 +206,12 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public ApiResponse<?> findGroupDetail(Long groupSeq, Long userSeq) {
-        //1. userSeq 사용해서 사용자 로그인 정보 확인 (수정필요)
+        //1. userSeq 사용해서 사용자 로그인 정보 확인
+        Optional<TblUser> userOpt = userRepository.findById(userSeq);
+        if (userOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
+
+        //2. groupSeq & userSeq 사용해서 그룹멤버인지 확인
+        if (!groupMemberService.checkGroupMember(groupSeq, userSeq)) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
         //2. groupSeq 사용해서 그룹 정보 조회
         Optional<TblGroup> groupOpt = groupRepository.findById(groupSeq);
@@ -200,10 +221,10 @@ public class GroupServiceImpl implements GroupService {
         //3. 편지보따리 달성도 조회
         int achievePercent = letterPackageService.packageAchievePercent(groupSeq);
 
-        //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업) (수정필요)
-        TblUsedQuestion question = null;
+        //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업)
+        QuestionDto.todayQuestion question = questionService.findTodayQuestion(group);
 
-        //5. 그룹멤버 프로필 조회
+        //5. 그룹멤버 프로필 조회 (수정필요)
         List<GroupMemberDto.profile> profileList = new ArrayList<>();
         List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
         for(TblGroupMember entity : groupMemberList){
@@ -222,15 +243,34 @@ public class GroupServiceImpl implements GroupService {
                 .groupName(group.getGroupName())
                 .dayAfterCnt(group.getCreateDate().toLocalDate().until(LocalDate.now(), ChronoUnit.DAYS)+1)
                 .achievePercent(achievePercent)
-                .todayQuiz(QuestionDto.todayQuiz.builder()
-                        .usedQuestionSeq(null)
-                        .question("일단 마음대로 질문 넣어높고 질문 파트 완료되면 구현 넣어야지.")
-                        .build())
+                .todayQuiz(question)
                 .groupMemberList(profileList)
                 .build();
 
         //7. 결과 반환
         return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
+    }
+
+    /**
+     * 가족그룹에서의 역할 update
+     * @param data GroupRequestDto.updateRole: update 관련 데이터
+     * @param userSeq Long:로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> updateRole(GroupRequestDto.updateRole data, Long userSeq) {
+        //1. 그룹 조회를 통해 가족 그룹인지 확인
+        Optional<TblGroup> groupOpt = groupRepository.findById(data.getGroupSeq());
+        if (groupOpt.isEmpty() || !"가족".equals(groupOpt.get().getCodeCategory().getCodeName()))
+            return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+
+        //2. 사용자와 그룹으로 멤버 조회 및 역할 update
+        boolean update = groupMemberService.updateRole(groupOpt.get().getGroupSeq(), userSeq, data.getCodeCategoryRoleSeq());
+
+        //3. 결과 반환
+        return update ? ApiResponse.SUCCESS(SuccessCode.UPDATE_USER_INFO)
+                : ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
     }
 
     /**
@@ -247,6 +287,14 @@ public class GroupServiceImpl implements GroupService {
             sb.append(characters.charAt(index));
         }
         return sb.toString();
+    }
+
+    /**
+     * 전체 그룹 조회
+     * @return List<TblGroup>:전체그룹
+     */
+    public List<TblGroup> findListAllGroup(){
+        return groupRepository.findAll();
     }
 
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface TblGroupMemberRepository extends JpaRepository<TblGroupMember, Long> {
     List<TblGroupMember> findByUser_UserSeq(Long userSeq);
+    List<TblGroupMember> findByGroup_GroupSeq(Long groupSeq);
     Optional<TblGroupMember> findByGroup_GroupSeqAndUser_UserSeq(Long groupSeq, Long userSeq);
     Long countByGroup_GroupSeq(Long groupSeq);
 }
