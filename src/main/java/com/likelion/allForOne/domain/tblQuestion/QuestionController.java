@@ -89,4 +89,16 @@ public class QuestionController {
         return ResponseEntity.ok().body(questionService.findByInpDateLastQandA(groupSeq, userSeq, inpDate));
     }
 
+    /**
+     * 특정 그룹에서 특정인에 대한 퀴즈 모아보기
+     * @param memberTargetSeq Long: 질문 대상자 멤버 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/someone/{memberTargetSeq}/questionList/{inpDate}")
+    public ResponseEntity<?> findSomeoneQAndA(@PathVariable("memberTargetSeq") Long memberTargetSeq, @PathVariable("inpDate") String inpDate){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.findSomeoneQAndA(memberTargetSeq, userSeq, inpDate));
+    }
+
 }

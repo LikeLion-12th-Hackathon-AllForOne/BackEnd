@@ -49,4 +49,13 @@ public interface TblUsedQuestionRepository extends JpaRepository<TblUsedQuestion
     Object[] findByUsedQuestionSeq(@Param("usedQuestionSeq") Long usedQuestionSeq);
     List<TblUsedQuestion> findTop7ByInpDateBeforeAndGroup_GroupSeqOrderByInpDateDesc(LocalDate inpDate, Long groupSeq);
     Optional<TblUsedQuestion> findByInpDateAndGroup_GroupSeq(LocalDate inpDate, Long groupSeq);
+
+    @Query(value="select * " +
+            "from tbl_used_question tuq " +
+            "where tuq.inp_date <= :inpDate " +
+            "and tuq.group_seq = :groupSeq " +
+            "and (tuq.member_target = :memberTarget or tuq.code_question_type = 28) " +
+            "order by inp_date desc " +
+            "limit 7 ", nativeQuery = true)
+    List<TblUsedQuestion> findSomeoneQAndA(@Param("inpDate") LocalDate inpDate, @Param("groupSeq") Long groupSeq, @Param("memberTarget") Long memberTarget);
 }

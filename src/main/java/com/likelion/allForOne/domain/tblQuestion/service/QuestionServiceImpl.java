@@ -298,6 +298,112 @@ public class QuestionServiceImpl implements QuestionService {
                 organizeQuestionAndAnswerAll(usedQuestionOpt.get(), groupMemberList));
     }
 
+    /**
+     * 특정 그룹에서 특정인에 대한 퀴즈 모아보기
+     * @param memberTargetSeq Long: 특정인(멤버) 구분자
+     * @param userSeq Long: 로그인 사용자 구분자
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> findSomeoneQAndA(Long memberTargetSeq, Long userSeq, String inpDate) {
+        //1. 멤버 구분자에 대한 조회
+        TblGroupMember memberTarget = groupMemberService.findByGroupMemberSeq(memberTargetSeq);
+        if(memberTarget == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+        String targetName = findMemberTargetName(memberTarget); //질문 대상의 이름 조회
+        Long groupSeq = memberTarget.getGroup().getGroupSeq();  //질문 대상의 방(그룹) 구분자
+
+        //2. 멤버 구분자가 속한 그룹에 로그인 사용자가 속했는지 확인하기
+        boolean userCheck = groupMemberService.checkGroupMember(groupSeq, userSeq);
+        if(!userCheck) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
+
+        //3. 오늘날짜 이전만 조회 가능
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate date = LocalDate.parse(inpDate, formatter);
+        if(!date.isBefore(LocalDate.now())) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+
+        //4. 전체 질문과 멤버 구분자를 target 으로 하는 질문 조회하기
+        List<TblUsedQuestion> targetQuestionList
+                = usedQuestionRepository.findSomeoneQAndA(date, groupSeq, memberTargetSeq);
+
+        //5. 그룹에 속한 멤버 조회
+        List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
+
+        //6. 각 질문에 대한 멤버 구분자를 target 으로 하는 답변 조회하기
+        List<QuestionResponseDto.SomeoneQuestionAndAnswer> result = new ArrayList<>();
+        for (TblUsedQuestion usedQuestionEntity : targetQuestionList) {
+            //6. 질문 정리하기
+            Long usedQuestionSeq = usedQuestionEntity.getUsedQuestionSeq();
+            QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestionObject(usedQuestionSeq);
+
+            //7. memberTarget 에 대한 멤버 전부의 답변 취합하기
+            List<AnswerDto.AnswerForm3> answerFormList = new ArrayList<>();
+            if (usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L) {
+                for(TblGroupMember memberAnswer : groupMemberList){
+                    Long memberAnswerSeq = memberAnswer.getMemberSeq();
+                    String memberAnswerName = findMemberTargetName(memberAnswer);
+
+                    //5. 한명의 답변자가 각 멤버에 대한 답변을 작성하는 질문의 경우(전체질문(28번 유형 질문)의 경우), 답변을 본인 제외하고 조회
+                    if(memberAnswer.getMemberSeq().equals(memberTargetSeq)) continue;
+
+                    //1. 저장된 답변 조회
+                    Optional<TblAnswer> bfAnswerOpt
+                            = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
+                            usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
+
+                    //answerFormList 에 추가
+                    answerFormList.add(bfAnswerOpt.isEmpty() ?
+                            AnswerDto.AnswerForm3.builder()         // 저장된 답변이 없는 경우
+                                    .memberAnswerSeq(memberAnswerSeq)
+                                    .memberAnswerName(memberAnswerName)
+                                    .build()
+                            : AnswerDto.AnswerForm3.builder()       // 저장된 답변이 존재할 경우
+                                    .memberAnswerSeq(memberAnswerSeq)
+                                    .memberAnswerName(memberAnswerName)
+                                    .answerSeq(bfAnswerOpt.get().getAnswerSeq())
+                                    .answerContents(bfAnswerOpt.get().getAnswerContents())
+                                    .build());
+                }
+            } else {
+                //5. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
+                for(TblGroupMember memberAnswer : groupMemberList){
+                    Long memberAnswerSeq = memberAnswer.getMemberSeq();
+                    String memberAnswerName = findMemberTargetName(memberAnswer);
+
+                    //1. 저장된 답변 조회
+                    Optional<TblAnswer> bfAnswerOpt
+                            = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
+                            usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
+
+                    //answerFormList 에 추가
+                    AnswerDto.AnswerForm3 answerForm3 = bfAnswerOpt.isEmpty() ?
+                            AnswerDto.AnswerForm3.builder()         // 저장된 답변이 없는 경우
+                                    .memberAnswerSeq(memberAnswerSeq)
+                                    .memberAnswerName(memberAnswerName)
+                                    .build()
+                            : AnswerDto.AnswerForm3.builder()       // 저장된 답변이 존재할 경우
+                            .memberAnswerSeq(memberAnswerSeq)
+                            .memberAnswerName(memberAnswerName)
+                            .answerSeq(bfAnswerOpt.get().getAnswerSeq())
+                            .answerContents(bfAnswerOpt.get().getAnswerContents())
+                            .build();
+
+                    //5. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
+                    //8. 본인이 한 답변은 항상 맨 앞에 위치
+                    if(memberAnswerSeq.equals(memberTargetSeq))
+                        answerFormList.add(0, answerForm3);
+                    else answerFormList.add(answerForm3);
+
+                }
+            }
+            result.add(QuestionResponseDto.SomeoneQuestionAndAnswer.builder()
+                            .questionForm(organizeUsedQuestion)
+                            .answerForm(answerFormList)
+                            .build());
+        }
+
+        //7. 결과 반환
+        return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
+    }
 
 
     /**

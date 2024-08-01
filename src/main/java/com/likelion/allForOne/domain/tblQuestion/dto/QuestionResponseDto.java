@@ -19,4 +19,10 @@ public class QuestionResponseDto {
         private QuestionDto.OrganizeQuestion questionForm;  //오늘의 질문
         private List<AnswerDto.AnswerForm2> answerForm;     //답변
     }
+    @Getter
+    @Builder
+    public static class SomeoneQuestionAndAnswer{
+        private QuestionDto.OrganizeQuestion questionForm;  //오늘의 질문
+        private List<AnswerDto.AnswerForm3> answerForm;     //답변
+    }
 }
