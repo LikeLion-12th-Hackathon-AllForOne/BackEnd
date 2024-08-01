@@ -16,6 +16,7 @@ public enum SuccessCode {
     SAVE_ANSWER(200, "답변이 저장되었습니다."),
     SAVE_SOME_ANSWER(200, "답변중 일부만 저장되었습니다."),
     CREATE_GROUP(201, "방(그룹)이 생성되었습니다."),
+    CREATE_LETTER(201, "편지가 등록되었습니다."),
     CREATE_QUESTION(201, "질문이 생성되었습니다."),
     JOIN_MEMBER(201, "방(그룹)에 참가되었습니다."),
     FOUND_IT(201, "조회가 완료되었습니다."),
