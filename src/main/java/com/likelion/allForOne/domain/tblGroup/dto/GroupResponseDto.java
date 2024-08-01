@@ -1,7 +1,7 @@
 package com.likelion.allForOne.domain.tblGroup.dto;
 
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberDto;
-import com.likelion.allForOne.domain.tblQuestion.QuestionDto;
+import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,7 +23,8 @@ public class GroupResponseDto {
         private String groupName;                               //방(그룹)이름
         private long dayAfterCnt;                               //생성일로부터 며칠
         private int achievePercent;                             //보따리 달성 퍼센트
-        private QuestionDto.todayQuiz todayQuiz;                //오늘의 퀴즈
+        private int questionStateVal;                           //오늘의 퀴즈 상태
+        private QuestionDto.todayQuestion todayQuiz;            //오늘의 퀴즈
         private List<GroupMemberDto.profile> groupMemberList;   //그룹멤버 프로필 리스트
     }
 }

@@ -18,6 +18,7 @@ public enum ErrorCode {
     SESSION_EXPIRED(403, HttpStatus.FORBIDDEN, "세션이 만료되었습니다."),
     RESOURCE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "Resource not found"),
     CODE_NOT_FOUND(404, HttpStatus.NOT_FOUND, "CODE를 찾을 수 없습니다."),
+    SAVE_SOME_FAIL(404, HttpStatus.NOT_FOUND, "일부 값을 저장하지 못했습니다."),
     // 5xx
     CREATE_FAIL(500, HttpStatus.INTERNAL_SERVER_ERROR, "객체 생성에 실패했습니다.")
     ;
