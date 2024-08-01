@@ -70,11 +70,23 @@ public class QuestionController {
      * @param groupSeq Long: 방(그룹) 구분자
      * @return ResponseEntity<?>
      */
-    @GetMapping("/last/{groupSeq}/question/{inpDate}")
+    @GetMapping("/last/{groupSeq}/questionList/{inpDate}")
     public ResponseEntity<?> findLastQandA(@PathVariable("groupSeq") Long groupSeq, @PathVariable("inpDate") String inpDate){
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
         return ResponseEntity.ok().body(questionService.findLastQandA(groupSeq, userSeq, inpDate));
+    }
+
+    /**
+     * 날짜로 지난 퀴즈 조회하기
+     * @param groupSeq Long: 방(그룹) 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/last/{groupSeq}/oneQuestion/{inpDate}")
+    public ResponseEntity<?> findByInpDateLastQandA(@PathVariable("groupSeq") Long groupSeq, @PathVariable("inpDate") String inpDate){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.findByInpDateLastQandA(groupSeq, userSeq, inpDate));
     }
 
 }

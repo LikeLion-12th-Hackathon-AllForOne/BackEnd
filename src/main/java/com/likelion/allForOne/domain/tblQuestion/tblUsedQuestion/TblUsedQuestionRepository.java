@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface TblUsedQuestionRepository extends JpaRepository<TblUsedQuestion, Long> {
 
@@ -47,4 +48,5 @@ public interface TblUsedQuestionRepository extends JpaRepository<TblUsedQuestion
             "where tuq.used_question_seq = :usedQuestionSeq", nativeQuery = true)
     Object[] findByUsedQuestionSeq(@Param("usedQuestionSeq") Long usedQuestionSeq);
     List<TblUsedQuestion> findTop7ByInpDateBeforeAndGroup_GroupSeqOrderByInpDateDesc(LocalDate inpDate, Long groupSeq);
+    Optional<TblUsedQuestion> findByInpDateAndGroup_GroupSeq(LocalDate inpDate, Long groupSeq);
 }
