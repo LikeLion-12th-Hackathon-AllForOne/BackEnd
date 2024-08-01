@@ -39,6 +39,9 @@ public class QuestionServiceImpl implements QuestionService {
     private final GroupMemberServiceImpl groupMemberService;
     private final AnswerServiceImpl answerService;
 
+    /* =================================================================
+     * Override
+     * ================================================================= */
     /**
      * 오늘의 질문 생성하기
      * @param groupEntity TblGroup: 방(그룹) 엔티티
@@ -193,7 +196,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
-     * 오늘의 질문 답변(임시저장 or 저장)
+     * 오늘의 질문 답변(임시저장 or 저장) 조회
      * @param usedQuestionSeq Long:오늘의 질문 구분자
      * @param memberSeq Long: 멤버 구분자
      * @param userSeq Long: 로그인 사용자
@@ -220,19 +223,19 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionDto.OrganizeQuestion question = organizeUsedQuestion(usedQuestionSeq);
 
         //4. 질문 유형에 따라 답변 한개 또는 리스트
-        List<AnswerDto.AnswerFormBasic> answerFormList = new ArrayList<>();
+        List<AnswerDto.BasedOnAnswerForm> answerFormList = new ArrayList<>();
         if (todayQuestion.getCodeQuestionType().getCodeSeq() == 28L) {
             //5. 여러명에 대한 답변(리스트)이 필요한 경우
             List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupEntity.getGroupSeq());
             for(TblGroupMember memberTarget : groupMemberList){
                 //6. 전체질문(28번 유형 질문)의 경우, 자신을 제외한 나머지에 대해 답변을 달아야함.
                 if(memberTarget.getMemberSeq().equals(memberSeq)) continue;
-                answerFormList.add(answerService.organizeAnswerForm(true, usedQuestionSeq, memberAnswer, memberTarget));
+                answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, memberSeq, memberTarget));
             }
         } else {
             //7. 답변 한개 질문의 경우,
             TblGroupMember memberTarget = todayQuestion.getMemberTarget();
-            answerFormList.add(answerService.organizeAnswerForm(true, usedQuestionSeq, memberAnswer, memberTarget));
+            answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, memberSeq, memberTarget));
         }
 
         //8. 데이터 반환
@@ -339,61 +342,24 @@ public class QuestionServiceImpl implements QuestionService {
             QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestion(usedQuestionSeq);
 
             //8. memberTarget 에 대한 멤버 전부의 답변 취합하기
-            List<AnswerDto.AnswerForm3> answerFormList = new ArrayList<>();
+            List<AnswerDto.BasedOnTargetForm> answerFormList = new ArrayList<>();
             if (usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L) {
                 for(TblGroupMember memberAnswer : groupMemberList){
-                    Long memberAnswerSeq = memberAnswer.getMemberSeq();
-                    String memberAnswerName = findMemberTargetName(memberAnswer);
-
                     //9. 한명의 답변자가 각 멤버에 대한 답변을 작성하는 질문의 경우(전체질문(28번 유형 질문)의 경우), 답변을 본인 제외하고 조회
                     if(memberAnswer.getMemberSeq().equals(memberTargetSeq)) continue;
-
-                    //10. 저장된 답변 조회
-                    Optional<TblAnswer> bfAnswerOpt
-                            = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
-                            usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
-
-                    //11. answerFormList 에 추가
-                    answerFormList.add(bfAnswerOpt.isEmpty() ?
-                            AnswerDto.AnswerForm3.builder()         // 저장된 답변이 없는 경우
-                                    .memberAnswerSeq(memberAnswerSeq)
-                                    .memberAnswerName(memberAnswerName)
-                                    .build()
-                            : AnswerDto.AnswerForm3.builder()       // 저장된 답변이 존재할 경우
-                                    .memberAnswerSeq(memberAnswerSeq)
-                                    .memberAnswerName(memberAnswerName)
-                                    .answerSeq(bfAnswerOpt.get().getAnswerSeq())
-                                    .answerContents(bfAnswerOpt.get().getAnswerContents())
-                                    .build());
+                    //10. 답변 조회
+                    answerFormList.add(answerService.organizeBasedOnTargetForm(usedQuestionSeq, memberAnswer, memberTargetSeq));
                 }
             } else {
                 //12. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
                 for(TblGroupMember memberAnswer : groupMemberList){
-                    Long memberAnswerSeq = memberAnswer.getMemberSeq();
-                    String memberAnswerName = findMemberTargetName(memberAnswer);
-
                     //13. 저장된 답변 조회
-                    Optional<TblAnswer> bfAnswerOpt
-                            = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
-                            usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
-
-                    //14. answerFormList 에 추가
-                    AnswerDto.AnswerForm3 answerForm3 = bfAnswerOpt.isEmpty() ?
-                            AnswerDto.AnswerForm3.builder()         // 저장된 답변이 없는 경우
-                                    .memberAnswerSeq(memberAnswerSeq)
-                                    .memberAnswerName(memberAnswerName)
-                                    .build()
-                            : AnswerDto.AnswerForm3.builder()       // 저장된 답변이 존재할 경우
-                            .memberAnswerSeq(memberAnswerSeq)
-                            .memberAnswerName(memberAnswerName)
-                            .answerSeq(bfAnswerOpt.get().getAnswerSeq())
-                            .answerContents(bfAnswerOpt.get().getAnswerContents())
-                            .build();
+                    AnswerDto.BasedOnTargetForm basedOnTargetForm = answerService.organizeBasedOnTargetForm(usedQuestionSeq, memberAnswer, memberTargetSeq);
 
                     //15. 본인이 한 답변은 항상 맨 위에 위치
-                    if(memberAnswerSeq.equals(memberTargetSeq))
-                        answerFormList.add(0, answerForm3);
-                    else answerFormList.add(answerForm3);
+                    if(memberAnswer.getMemberSeq().equals(memberTargetSeq))
+                        answerFormList.add(0, basedOnTargetForm);
+                    else answerFormList.add(basedOnTargetForm);
 
                 }
             }
@@ -404,7 +370,9 @@ public class QuestionServiceImpl implements QuestionService {
         return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
     }
 
-
+    /* =================================================================
+     * 분리 코드
+     * ================================================================= */
     /**
      * 멤버 역할 값으로 질문구분 코드 구분자(codeQuestionClass) 찾기
      * @param codeCategoryRoleSeq Long: 멤버 역할
@@ -431,12 +399,12 @@ public class QuestionServiceImpl implements QuestionService {
         TblGroupMember memberTarget = groupMemberService.findByGroupMemberSeq(saveData.getMemberTargetSeq());
         if(memberTarget == null
                 || !memberAnswer.getGroup().getGroupSeq()
-                    .equals(memberTarget.getGroup().getGroupSeq())) return 0;
+                .equals(memberTarget.getGroup().getGroupSeq())) return 0;
 
         //2. 이전에 (임시)저장한 기록이 있는지 확인
         Optional<TblAnswer> bfAnswerOpt
                 = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
-                        question.getUsedQuestionSeq(), memberAnswer.getMemberSeq(), memberTarget.getMemberSeq());   //질문, 답변자, 질문 대상자, 데이터로 기존에 있던 답변 데이터 확인
+                question.getUsedQuestionSeq(), memberAnswer.getMemberSeq(), memberTarget.getMemberSeq());   //질문, 답변자, 질문 대상자, 데이터로 기존에 있던 답변 데이터 확인
         if(bfAnswerOpt.isPresent()) {
             //3. 저장된 기록과 일치하지 않는 정보에 대해 수정/저장을 진행하지 않음
             TblAnswer bfAnswer = bfAnswerOpt.get();
@@ -460,39 +428,6 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
-     * 답변 반환 데이터 정리
-     * @param usedQuestionSeq Long: 오늘의(출제된) 질문 구분자
-     * @param memberAnswerSeq Long: 질문 답변자 구분자
-     * @param memberTarget TblGroupMember: 질문 대상자 entity
-     * @return AnswerDto.AnswerForm: 답변 반환 DTO
-     */
-    private AnswerDto.AnswerForm organizeAnswerForm(Long usedQuestionSeq, Long memberAnswerSeq, TblGroupMember memberTarget){
-        //1. 질문 대상의 이름 조회
-        String targetName = findMemberTargetName(memberTarget);
-
-        //2. 저장된 답변 존재 확인
-        Optional<TblAnswer> bfAnswerOpt
-                = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
-                usedQuestionSeq, memberAnswerSeq, memberTarget.getMemberSeq());
-        if (bfAnswerOpt.isPresent()) {
-            //3. 저장된 답변이 존재할 경우
-            TblAnswer bfAnswer = bfAnswerOpt.get();
-            return AnswerDto.AnswerForm.builder()
-                    .answerSeq(bfAnswer.getAnswerSeq())
-                    .memberTargetSeq(memberTarget.getMemberSeq())
-                    .memberTargetName(targetName)
-                    .answerContents(bfAnswer.getAnswerContents())
-                    .build();
-        } else {
-            //4. 이전 답변이 없는 경우
-            return AnswerDto.AnswerForm.builder()
-                    .memberTargetSeq(memberTarget.getMemberSeq())
-                    .memberTargetName(targetName)
-                    .build();
-        }
-    }
-
-    /**
      * 질문정리 및 해당 질문에 대한 멤버 리스트의 답변 모아보기 정리
      * @param usedQuestionEntity TblUsedQuestion: 오늘의(제출된) 퀴즈 entity
      * @param groupMemberList List<TblGroupMember>: 방(그룹)에 참가하고 있는 멤버 리스트
@@ -503,52 +438,30 @@ public class QuestionServiceImpl implements QuestionService {
         Long usedQuestionSeq = usedQuestionEntity.getUsedQuestionSeq();
         QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestion(usedQuestionSeq);
         //2. 멤버별 답변 조회
-        List<AnswerDto.AnswerForm2> memberAnswerList = new ArrayList<>();
+        List<AnswerDto.BasedOnAnswerFormList> memberAnswerList = new ArrayList<>();
         for(TblGroupMember groupAnswerMember : groupMemberList){
             Long groupAnswerMemberSeq = groupAnswerMember.getMemberSeq();
-            List<AnswerDto.AnswerFormBasic> answerFormList = new ArrayList<>();
+            List<AnswerDto.BasedOnAnswerForm> answerFormList = new ArrayList<>();
             if (usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L) {
                 //3. 여러명에 대한 답변(리스트)이 필요한 경우
                 for(TblGroupMember memberTarget : groupMemberList){
                     //4. 전체질문(28번 유형 질문)의 경우, 자신을 제외한 나머지에 대해 답변을 달아야함.
                     if(memberTarget.getMemberSeq().equals(groupAnswerMemberSeq)) continue;
-                    answerFormList.add(answerService.organizeAnswerForm(true, usedQuestionSeq, groupAnswerMember, memberTarget));
+                    answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, groupAnswerMemberSeq, memberTarget));
                 }
             } else {
                 //5. 답변 한개 질문의 경우,
-                answerFormList.add(answerService.organizeAnswerForm(true, usedQuestionSeq, groupAnswerMember, usedQuestionEntity.getMemberTarget()));
+                answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, groupAnswerMemberSeq, usedQuestionEntity.getMemberTarget()));
             }
             //6. 멤버별 답변 DTO 정리
-            memberAnswerList.add(AnswerDto.AnswerForm2.builder()
+            memberAnswerList.add(AnswerDto.BasedOnAnswerFormList.builder()
                     .memberAnswerSeq(groupAnswerMemberSeq)
-                    .memberAnswerName(findMemberTargetName(groupAnswerMember))
+                    .memberAnswerName(groupMemberService.findMemberTargetName(groupAnswerMember))
                     .memberAnswerList(answerFormList)
                     .build());
         }
         //7. 데이터 반환
         return new QuestionResponseDto.QuestionAndAnswer<>(organizeUsedQuestion, memberAnswerList);
     }
-
-
-    /* =================================================================
-     * 공통 코드
-     * ================================================================= */
-    /**
-     * 방(그룹) 역할에 맞는 멤버 이름 출력하기
-     * @param memberTarget TblGroupMember: 멤버 entity
-     * @return String 출력될 이름
-     */
-    private String findMemberTargetName(TblGroupMember memberTarget){
-        TblCode codeCategoryRole = memberTarget.getCodeCategoryRole();
-        if (codeCategoryRole.getCodeSeq() == 38
-                || codeCategoryRole.getCodeSeq() == 39)
-            return codeCategoryRole.getCodeName();
-        else return memberTarget.getUser().getUserName();
-    }
-
-
-    /* =================================================================
-     * 분리 코드
-     * ================================================================= */
 
 }

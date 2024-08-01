@@ -1,9 +1,9 @@
 package com.likelion.allForOne.domain.tblQuestion.tblAnswer.service;
 
+import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
 import com.likelion.allForOne.domain.tblQuestion.tblAnswer.TblAnswerRepository;
 import com.likelion.allForOne.domain.tblQuestion.tblAnswer.dto.AnswerDto;
 import com.likelion.allForOne.entity.TblAnswer;
-import com.likelion.allForOne.entity.TblCode;
 import com.likelion.allForOne.entity.TblGroupMember;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,54 +17,60 @@ import java.util.Optional;
 public class AnswerServiceImpl implements AnswerService{
     private final TblAnswerRepository answerRepository;
 
+    private final GroupMemberServiceImpl groupMemberService;
 
     /* =================================================================
      * Override
      * ================================================================= */
     /**
-     * 답변 정리
-     * @param isBasedOnAnswer boolean: true=답변자 기준 / false=대상자 기준
+     * 답변자 기준 대상자별 답변 조회
      * @param usedQuestionSeq Long: 오늘의(출제된) 퀴즈 구분자
-     * @param memberAnswerEntity Long: 답변자 멤버 entity
+     * @param memberAnswerSeq Long: 답변자 멤버 구분자
      * @param memberTargetEntity TblGroupMember: 대상자 멤버 entity
      * @return AnswerDto.AnswerFormBasic
      */
     @Override
-    public AnswerDto.AnswerFormBasic organizeAnswerForm(boolean isBasedOnAnswer, Long usedQuestionSeq, TblGroupMember memberAnswerEntity, TblGroupMember memberTargetEntity) {
+    public AnswerDto.BasedOnAnswerForm organizeBasedOnAnswerForm(Long usedQuestionSeq, Long memberAnswerSeq, TblGroupMember memberTargetEntity) {
         //1. 멤버 구분자
-        Long memberAnswerSeq = memberAnswerEntity.getMemberSeq();
         Long memberTargetSeq = memberTargetEntity.getMemberSeq();
 
-        //3. 답변 조회
+        //2. 답변 조회
         Optional<TblAnswer> bfAnswerOpt
-                = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
+                = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
+                        usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
 
         //3. 데이터 반환
-        return AnswerDto.AnswerFormBasic.builder()
-                .memberAnswerSeq(isBasedOnAnswer ? null : memberAnswerSeq)
-                .memberAnswerName(isBasedOnAnswer ? null : findMemberTargetName(memberAnswerEntity))
-                .memberTargetSeq(isBasedOnAnswer ? memberTargetSeq : null)
-                .memberTargetName(isBasedOnAnswer ? findMemberTargetName(memberTargetEntity) : null)
+        return AnswerDto.BasedOnAnswerForm.builder()
+                .memberTargetSeq(memberTargetSeq)
+                .memberTargetName(groupMemberService.findMemberTargetName(memberTargetEntity))
                 .answerSeq(bfAnswerOpt.map(TblAnswer::getAnswerSeq).orElse(null))
                 .answerContents(bfAnswerOpt.map(TblAnswer::getAnswerContents).orElse(null))
                 .build();
     }
 
-    /* =================================================================
-     * 공통 코드
-     * ================================================================= */
-    private String findMemberTargetName(TblGroupMember memberTarget){
-        TblCode codeCategoryRole = memberTarget.getCodeCategoryRole();
-        if (codeCategoryRole.getCodeSeq() == 38
-                || codeCategoryRole.getCodeSeq() == 39)
-            return codeCategoryRole.getCodeName();
-        else return memberTarget.getUser().getUserName();
+    /**
+     * 대상자 기준 답변자별 답변 조회
+     * @param usedQuestionSeq Long: 오늘의(출제된) 퀴즈 구분자
+     * @param memberAnswerEntity TblGroupMember: 답변자 멤버 entity
+     * @param memberTargetSeq Long: 대상자 멤버 구분자
+     * @return AnswerDto.AnswerForm3
+     */
+    @Override
+    public AnswerDto.BasedOnTargetForm organizeBasedOnTargetForm(Long usedQuestionSeq, TblGroupMember memberAnswerEntity, Long memberTargetSeq) {
+        //1. Based 멤버 구분자
+        Long memberAnswerSeq = memberAnswerEntity.getMemberSeq();
+
+        //2. 답변 조회
+        Optional<TblAnswer> bfAnswerOpt
+                = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
+                        usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
+
+        //3. 데이터 반환
+        return AnswerDto.BasedOnTargetForm.builder()
+                .memberAnswerSeq(memberAnswerSeq)
+                .memberAnswerName(groupMemberService.findMemberTargetName(memberAnswerEntity))
+                .answerSeq(bfAnswerOpt.map(TblAnswer::getAnswerSeq).orElse(null))
+                .answerContents(bfAnswerOpt.map(TblAnswer::getAnswerContents).orElse(null))
+                .build();
     }
-
-
-    /* =================================================================
-     * 분리 코드
-     * ================================================================= */
-
-
 }

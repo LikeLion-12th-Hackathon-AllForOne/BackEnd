@@ -52,7 +52,7 @@ public class QuestionController {
     }
 
     /**
-     * 오늘의 질문 답변(임시저장 or 저장)
+     * 오늘의 질문 답변(임시저장 or 저장) 조회
      * @param usedQuestionSeq Long: 오늘의 질문 구분자
      * @param memberSeq Long: 멤버 구분자
      * @return ResponseEntity<?>
