@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     // 4xx
+    CREATE_LETTER_FAIL(400, HttpStatus.BAD_REQUEST, "편지 등록에 실패했습니다."),
     ALREADY_EXISTING(400, HttpStatus.BAD_REQUEST, "이미 존재하는 값입니다."),
     INVALID_PARAMETER(400, HttpStatus.BAD_REQUEST, "파라미터 값을 다시 확인해주세요."),
     LOGIN_FAIL(400, HttpStatus.BAD_REQUEST, "로그인에 실패했습니다."),

@@ -25,7 +25,7 @@ public class TblLetter extends BaseEntity {
     @Column(columnDefinition = "varchar(1500) not null comment '편지내용'")
     private String letterContents;  //편지내용
     @Column(columnDefinition = "tinyint default 0 not null comment '편지읽음여부'")
-    private Integer letterRead;     //편지읽음여부
+    private Integer letterRead;     //편지읽음여부 (안 읽음 = 0, 읽음 = 1)
 
 
     @Comment(value="받는사람 구분자")

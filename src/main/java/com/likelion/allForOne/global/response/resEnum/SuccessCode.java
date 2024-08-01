@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum SuccessCode {
     // COMMON
     CREATE_GROUP(201, "방(그룹)이 생성되었습니다."),
+    CREATE_LETTER(201, "편지가 등록되었습니다."),
     JOIN_MEMBER(201, "방(그룹)에 참가되었습니다."),
     FOUND_IT(201, "조회가 완료되었습니다."),
     FOUND_LIST(201, "목록 조회가 완료되었습니다."),
