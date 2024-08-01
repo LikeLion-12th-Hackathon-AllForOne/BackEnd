@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 public interface QuestionService {
     void createTodayQuestion(LocalDate inpDate, TblGroup entity);  //오늘의 질문 생성하기
+    Long findTodayQuestionState(TblGroup groupEntity);  //오늘의 퀴즈 출제 상태 및 오늘의 퀴즈 구분자 조회
     QuestionDto.OrganizeQuestion findTodayQuestion(Long usedQuestionSeq);  //오늘의 질문 조회하기
     ApiResponse<?> addQuestion(QuestionRequestDto.AddQuestion data, Long userSeq);  //질문 추가하기
     ApiResponse<?> saveAnswer(int answerTmpYn, QuestionRequestDto.SaveAnswerList data, Long userSeq);  //답변 (임시)저장 : 임시저장 여부(저장:0 / 임시저장:1)

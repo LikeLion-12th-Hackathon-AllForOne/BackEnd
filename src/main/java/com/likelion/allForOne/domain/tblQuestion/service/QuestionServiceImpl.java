@@ -81,6 +81,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @param groupEntity TblGroup: 방(그룹) entity
      * @return Long: 오늘의 퀴즈 구분자
      */
+    @Override
     public Long findTodayQuestionState(TblGroup groupEntity){
         //1. 오늘의 퀴즈 출제 상태 확인
         int todayQuestionState = groupEntity.getCodeQuestionStateSeq().getCodeVal();

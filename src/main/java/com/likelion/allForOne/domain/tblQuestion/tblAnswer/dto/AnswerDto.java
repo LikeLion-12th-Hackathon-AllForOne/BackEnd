@@ -1,6 +1,5 @@
 package com.likelion.allForOne.domain.tblQuestion.tblAnswer.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
