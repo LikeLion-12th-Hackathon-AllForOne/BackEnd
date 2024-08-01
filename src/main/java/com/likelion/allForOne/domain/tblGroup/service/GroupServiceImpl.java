@@ -222,7 +222,7 @@ public class GroupServiceImpl implements GroupService {
         int achievePercent = letterPackageService.packageAchievePercent(groupSeq);
 
         //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업)
-        QuestionDto.todayQuestion question = questionService.findTodayQuestion(group);
+        QuestionDto.TodayQuestion question = questionService.findTodayQuestion(group);
 
         //5. 그룹멤버 프로필 조회 (수정필요)
         List<GroupMemberDto.profile> profileList = new ArrayList<>();

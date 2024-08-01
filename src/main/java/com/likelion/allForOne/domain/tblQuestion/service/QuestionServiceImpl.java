@@ -80,11 +80,11 @@ public class QuestionServiceImpl implements QuestionService {
      * @return QuestionDto.todayQuestion
      */
     @Override
-    public QuestionDto.todayQuestion findTodayQuestion(TblGroup groupEntity) {
+    public QuestionDto.TodayQuestion findTodayQuestion(TblGroup groupEntity) {
         //1. 오늘의 퀴즈 상태에 따른 반환
         int todayQuestionState = groupEntity.getCodeQuestionStateSeq().getCodeVal();
         if (groupEntity.getCodeQuestionStateSeq().getCodeVal() != 1)
-            return QuestionDto.todayQuestion.builder()
+            return QuestionDto.TodayQuestion.builder()
                     .questionStateVal(todayQuestionState)
                     .questionStateMsg(groupEntity.getCodeQuestionStateSeq().getCodeName())
                     .build();
@@ -92,14 +92,14 @@ public class QuestionServiceImpl implements QuestionService {
         //2. groupSeq 와 inpDate 가 오늘의 usedQuestion 데이터 조회
         Object[] todayQuestionOpt = usedQuestionRepository.findByInpDateAndGroup_GroupSeq(groupEntity.getGroupSeq());
         if (todayQuestionOpt.length == 0)
-            return QuestionDto.todayQuestion.builder()
+            return QuestionDto.TodayQuestion.builder()
                     .questionStateVal(4)
                     .questionStateMsg("문제출제를 기다리는 중입니다.")
                     .build();
 
         //3. 데이터 반환
         Object[] todayQuestion = (Object[]) todayQuestionOpt[0];
-        return QuestionDto.todayQuestion.builder()
+        return QuestionDto.TodayQuestion.builder()
                 .questionStateVal(todayQuestionState)
                 .questionStateMsg(groupEntity.getCodeQuestionStateSeq().getCodeName())
                 .questionType(((Number)todayQuestion[1]).intValue() == 1 ? 1 : 2) // 1: 전체 질문 / 2: 개별질문
@@ -211,7 +211,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         //3. 질문 정리
         TblUsedQuestion todayQuestion = todayQuestionOpt.get();
-        QuestionDto.todayQuestion question = findTodayQuestion(groupEntity);
+        QuestionDto.TodayQuestion question = findTodayQuestion(groupEntity);
 
         //4. 질문 유형에 따라 답변 한개 또는 리스트
         List<AnswerDto.AnswerForm> answerFormList = new ArrayList<>();
@@ -309,7 +309,6 @@ public class QuestionServiceImpl implements QuestionService {
         //1. 멤버 구분자에 대한 조회
         TblGroupMember memberTarget = groupMemberService.findByGroupMemberSeq(memberTargetSeq);
         if(memberTarget == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
-        String targetName = findMemberTargetName(memberTarget); //질문 대상의 이름 조회
         Long groupSeq = memberTarget.getGroup().getGroupSeq();  //질문 대상의 방(그룹) 구분자
 
         //2. 멤버 구분자가 속한 그룹에 로그인 사용자가 속했는지 확인하기
@@ -331,26 +330,26 @@ public class QuestionServiceImpl implements QuestionService {
         //6. 각 질문에 대한 멤버 구분자를 target 으로 하는 답변 조회하기
         List<QuestionResponseDto.SomeoneQuestionAndAnswer> result = new ArrayList<>();
         for (TblUsedQuestion usedQuestionEntity : targetQuestionList) {
-            //6. 질문 정리하기
+            //7. 질문 정리하기
             Long usedQuestionSeq = usedQuestionEntity.getUsedQuestionSeq();
             QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestionObject(usedQuestionSeq);
 
-            //7. memberTarget 에 대한 멤버 전부의 답변 취합하기
+            //8. memberTarget 에 대한 멤버 전부의 답변 취합하기
             List<AnswerDto.AnswerForm3> answerFormList = new ArrayList<>();
             if (usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L) {
                 for(TblGroupMember memberAnswer : groupMemberList){
                     Long memberAnswerSeq = memberAnswer.getMemberSeq();
                     String memberAnswerName = findMemberTargetName(memberAnswer);
 
-                    //5. 한명의 답변자가 각 멤버에 대한 답변을 작성하는 질문의 경우(전체질문(28번 유형 질문)의 경우), 답변을 본인 제외하고 조회
+                    //9. 한명의 답변자가 각 멤버에 대한 답변을 작성하는 질문의 경우(전체질문(28번 유형 질문)의 경우), 답변을 본인 제외하고 조회
                     if(memberAnswer.getMemberSeq().equals(memberTargetSeq)) continue;
 
-                    //1. 저장된 답변 조회
+                    //10. 저장된 답변 조회
                     Optional<TblAnswer> bfAnswerOpt
                             = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
                             usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
 
-                    //answerFormList 에 추가
+                    //11. answerFormList 에 추가
                     answerFormList.add(bfAnswerOpt.isEmpty() ?
                             AnswerDto.AnswerForm3.builder()         // 저장된 답변이 없는 경우
                                     .memberAnswerSeq(memberAnswerSeq)
@@ -364,17 +363,17 @@ public class QuestionServiceImpl implements QuestionService {
                                     .build());
                 }
             } else {
-                //5. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
+                //12. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
                 for(TblGroupMember memberAnswer : groupMemberList){
                     Long memberAnswerSeq = memberAnswer.getMemberSeq();
                     String memberAnswerName = findMemberTargetName(memberAnswer);
 
-                    //1. 저장된 답변 조회
+                    //13. 저장된 답변 조회
                     Optional<TblAnswer> bfAnswerOpt
                             = answerRepository.findByUsedQuestion_UsedQuestionSeqAndMemberAnswer_MemberSeqAndMemberTarget_MemberSeq(
                             usedQuestionSeq, memberAnswerSeq, memberTargetSeq);
 
-                    //answerFormList 에 추가
+                    //14. answerFormList 에 추가
                     AnswerDto.AnswerForm3 answerForm3 = bfAnswerOpt.isEmpty() ?
                             AnswerDto.AnswerForm3.builder()         // 저장된 답변이 없는 경우
                                     .memberAnswerSeq(memberAnswerSeq)
@@ -387,8 +386,7 @@ public class QuestionServiceImpl implements QuestionService {
                             .answerContents(bfAnswerOpt.get().getAnswerContents())
                             .build();
 
-                    //5. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
-                    //8. 본인이 한 답변은 항상 맨 앞에 위치
+                    //15. 본인이 한 답변은 항상 맨 위에 위치
                     if(memberAnswerSeq.equals(memberTargetSeq))
                         answerFormList.add(0, answerForm3);
                     else answerFormList.add(answerForm3);

@@ -18,7 +18,7 @@ public class QuestionDto {
     }
     @Getter
     @Builder
-    public static class todayQuestion{
+    public static class TodayQuestion{
         private int questionStateVal;    //오늘의 퀴즈 상태코드
         private String questionStateMsg; //오늘의 퀴즈 상태메세지
         private int questionType;        //퀴즈 유형
