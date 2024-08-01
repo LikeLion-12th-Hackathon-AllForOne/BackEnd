@@ -274,6 +274,7 @@ public class QuestionServiceImpl implements QuestionService {
      * @param userSeq Long: 사용자 구분자
      * @return ApiResponse<?>
      */
+    @Override
     public ApiResponse<?> findByInpDateLastQandA(Long groupSeq, Long userSeq, String inpDate) {
         //1. 해당 유저가 그룹에 속한 유저인지 확인
         boolean memberCheck = groupMemberService.checkGroupMember(groupSeq, userSeq);
@@ -418,8 +419,6 @@ public class QuestionServiceImpl implements QuestionService {
                 .question((String)todayQuestion[3]+todayQuestion[4])
                 .build();
     }
-
-    // 질문정리 및 해당 질문에 대한 멤버 리스트의 답변 모아보기 정리
 
     /**
      * 질문정리 및 해당 질문에 대한 멤버 리스트의 답변 모아보기 정리
