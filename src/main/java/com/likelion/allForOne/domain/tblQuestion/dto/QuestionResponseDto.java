@@ -1,28 +1,16 @@
 package com.likelion.allForOne.domain.tblQuestion.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 public class QuestionResponseDto {
-    @Getter
-    @Builder
-    public static class TodayQuestionAndAnswer{
-        private QuestionDto.TodayQuestion todayQuestion;    //오늘의 질문
-        private List<AnswerDto.AnswerForm> saveAnswerList;  //답변
-    }
-    @Getter
-    @Builder
-    public static class QuestionAndAnswer{
-        private QuestionDto.OrganizeQuestion questionForm;  //오늘의 질문
-        private List<AnswerDto.AnswerForm2> answerForm;     //답변
-    }
-    @Getter
-    @Builder
-    public static class SomeoneQuestionAndAnswer{
-        private QuestionDto.OrganizeQuestion questionForm;  //오늘의 질문
-        private List<AnswerDto.AnswerForm3> answerForm;     //답변
-    }
+    /**
+     * @param questionForm QuestionDto.OrganizeQuestion: 오늘의(출제된) 질문
+     * @param answerForm   List<T>: 답변 리스트
+     */
+    public record QuestionAndAnswer<T>(
+            QuestionDto.OrganizeQuestion questionForm,
+            List<T> answerForm) {}
 }

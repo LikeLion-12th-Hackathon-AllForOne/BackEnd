@@ -221,10 +221,21 @@ public class GroupServiceImpl implements GroupService {
         //3. 편지보따리 달성도 조회
         int achievePercent = letterPackageService.packageAchievePercent(groupSeq);
 
-        //4. 오늘의 퀴즈 조회 (퀴즈 파트 구현후 작업)
-        QuestionDto.TodayQuestion question = questionService.findTodayQuestion(group);
+        //4. 오늘의 퀴즈 출제 상태 조회
+        int questionStateVal = group.getCodeQuestionStateSeq().getCodeVal();
+        String questionStateMsg = group.getCodeQuestionStateSeq().getCodeName();
+        Long usedQuestionSeq = questionService.findTodayQuestionState(group);
+        if (group.getCodeQuestionStateSeq().getCodeVal() == 1 && usedQuestionSeq == null) {
+            TblCode stateCode = codeService.findCodeByCodeVal(1, "questionState", 4);
+            questionStateVal = stateCode != null ? stateCode.getCodeVal() : 0;
+            questionStateMsg = stateCode != null ? stateCode.getCodeName() : "";
+        }
 
-        //5. 그룹멤버 프로필 조회 (수정필요)
+        //5. 오늘의 퀴즈 조회
+        QuestionDto.OrganizeQuestion question =
+                questionStateVal == 1 ? questionService.findTodayQuestion(usedQuestionSeq) : null;
+
+        //6. 그룹멤버 프로필 조회 (수정필요)
         List<GroupMemberDto.profile> profileList = new ArrayList<>();
         List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
         for(TblGroupMember entity : groupMemberList){
@@ -237,17 +248,19 @@ public class GroupServiceImpl implements GroupService {
                     .build());
         }
 
-        //6. 데이터 dto 전환
+        //7. 데이터 dto 전환
         GroupResponseDto.findGroupDetail result = GroupResponseDto.findGroupDetail.builder()
                 .ownerYn(userSeq.equals(group.getUserOwner().getUserSeq()))
                 .groupName(group.getGroupName())
                 .dayAfterCnt(group.getCreateDate().toLocalDate().until(LocalDate.now(), ChronoUnit.DAYS)+1)
                 .achievePercent(achievePercent)
+                .questionStateVal(questionStateVal)
+                .questionStateMsg(questionStateMsg)
                 .todayQuiz(question)
                 .groupMemberList(profileList)
                 .build();
 
-        //7. 결과 반환
+        //8. 결과 반환
         return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
     }
 
