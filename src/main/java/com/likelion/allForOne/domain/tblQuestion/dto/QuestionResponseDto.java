@@ -13,4 +13,10 @@ public class QuestionResponseDto {
         private QuestionDto.todayQuestion todayQuestion;    //오늘의 질문
         private List<AnswerDto.AnswerForm> saveAnswerList;  //답변
     }
+    @Getter
+    @Builder
+    public static class QuestionAndAnswer{
+        private QuestionDto.OrganizeQuestion questionForm;  //오늘의 질문
+        private List<AnswerDto.AnswerForm2> answerForm;     //답변
+    }
 }
