@@ -233,7 +233,7 @@ public class GroupServiceImpl implements GroupService {
 
         //5. 오늘의 퀴즈 조회
         QuestionDto.OrganizeQuestion question =
-                questionStateVal == 1 ? questionService.findTodayQuestion(usedQuestionSeq) : null;
+                questionStateVal == 1 ? questionService.organizeUsedQuestion(usedQuestionSeq) : null;
 
         //6. 그룹멤버 프로필 조회 (수정필요)
         List<GroupMemberDto.profile> profileList = new ArrayList<>();

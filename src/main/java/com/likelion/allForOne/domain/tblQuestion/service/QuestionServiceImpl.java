@@ -94,17 +94,18 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
-     * 오늘의 퀴즈 질문 조회
-     * @param usedQuestionSeq Long:방(그룹) 엔티티
+     * 오늘의(제출된) 질문 정리
+     * @param usedQuestionSeq Long:오늘의(제출된) 질문 구분자
      * @return QuestionDto.OrganizeQuestion
      */
     @Override
-    public QuestionDto.OrganizeQuestion findTodayQuestion(Long usedQuestionSeq) {
+    public QuestionDto.OrganizeQuestion organizeUsedQuestion(Long usedQuestionSeq) {
         //1. groupSeq 와 inpDate 가 오늘의 usedQuestion 데이터 조회
         Object[] todayQuestionOpt = usedQuestionRepository.findByUsedQuestionSeq(usedQuestionSeq);
-        Object[] todayQuestion = (Object[]) todayQuestionOpt[0];
+        if (todayQuestionOpt.length == 0) return null;
 
         //2. 데이터 반환
+        Object[] todayQuestion = (Object[]) todayQuestionOpt[0];
         return QuestionDto.OrganizeQuestion.builder()
                 .questionType(((Number)todayQuestion[1]).intValue() == 1 ? 1 : 2) // 1: 전체 질문 / 2: 개별질문
                 .usedQuestionSeq(((Number)todayQuestion[0]).longValue())
@@ -216,7 +217,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         //3. 질문 정리
         TblUsedQuestion todayQuestion = todayQuestionOpt.get();
-        QuestionDto.OrganizeQuestion question = findTodayQuestion(usedQuestionSeq);
+        QuestionDto.OrganizeQuestion question = organizeUsedQuestion(usedQuestionSeq);
 
         //4. 질문 유형에 따라 답변 한개 또는 리스트
         List<AnswerDto.AnswerFormBasic> answerFormList = new ArrayList<>();
@@ -335,7 +336,7 @@ public class QuestionServiceImpl implements QuestionService {
         for (TblUsedQuestion usedQuestionEntity : targetQuestionList) {
             //7. 질문 정리하기
             Long usedQuestionSeq = usedQuestionEntity.getUsedQuestionSeq();
-            QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestionObject(usedQuestionSeq);
+            QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestion(usedQuestionSeq);
 
             //8. memberTarget 에 대한 멤버 전부의 답변 취합하기
             List<AnswerDto.AnswerForm3> answerFormList = new ArrayList<>();
@@ -492,26 +493,6 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     /**
-     * 오늘의(제출된) 질문 정리
-     * @param usedQuestionSeq Long: 제출된 질문
-     * @return QuestionDto.OrganizeQuestion
-     */
-    private QuestionDto.OrganizeQuestion organizeUsedQuestionObject(Long usedQuestionSeq){
-        //1. 쿼리 조회 및 데이터 정리
-        Object[] todayQuestionOpt = usedQuestionRepository.findByUsedQuestionSeq(usedQuestionSeq);
-        if (todayQuestionOpt.length == 0) return null;
-
-        //2. 데이터 반환
-        Object[] todayQuestion = (Object[]) todayQuestionOpt[0];
-        return QuestionDto.OrganizeQuestion.builder()
-                .questionType(((Number)todayQuestion[1]).intValue() == 1 ? 1 : 2) // 1: 전체 질문 / 2: 개별질문
-                .usedQuestionSeq(((Number)todayQuestion[0]).longValue())
-                .inpDate((String)todayQuestion[2])
-                .question((String)todayQuestion[3]+todayQuestion[4])
-                .build();
-    }
-
-    /**
      * 질문정리 및 해당 질문에 대한 멤버 리스트의 답변 모아보기 정리
      * @param usedQuestionEntity TblUsedQuestion: 오늘의(제출된) 퀴즈 entity
      * @param groupMemberList List<TblGroupMember>: 방(그룹)에 참가하고 있는 멤버 리스트
@@ -520,7 +501,7 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionResponseDto.QuestionAndAnswer<?> organizeQuestionAndAnswerAll(TblUsedQuestion usedQuestionEntity, List<TblGroupMember> groupMemberList){
         //1. 질문 정리
         Long usedQuestionSeq = usedQuestionEntity.getUsedQuestionSeq();
-        QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestionObject(usedQuestionSeq);
+        QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestion(usedQuestionSeq);
         //2. 멤버별 답변 조회
         List<AnswerDto.AnswerForm2> memberAnswerList = new ArrayList<>();
         for(TblGroupMember groupAnswerMember : groupMemberList){
