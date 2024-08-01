@@ -18,7 +18,7 @@ public interface TblUsedQuestionRepository extends JpaRepository<TblUsedQuestion
             "case " +
             "when tuq.code_question_type = 28 then (select tcq.com_question from tbl_com_question tcq where tcq.com_question_seq = tuq.com_question_seq) " +
             "when tuq.code_question_type = 29 then (select tcq.com_question from tbl_com_question tcq where tcq.com_question_seq = tuq.com_question_seq) " +
-            "when tuq.code_question_type = 30 then (select taq.add_question from tbl_add_question taq where taq.add_question = tuq.com_question_seq) " +
+            "when tuq.code_question_type = 30 then (select taq.add_question from tbl_add_question taq where taq.add_question_seq = tuq.add_question_seq) " +
             "else '' " +
             "end as question " +
             "from tbl_used_question tuq " +
