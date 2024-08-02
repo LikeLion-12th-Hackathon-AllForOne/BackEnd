@@ -1,2 +1,4 @@
-package com.likelion.allForOne.domain.tblLetter.dto;public class LetterResponseDto {
+package com.likelion.allForOne.domain.tblLetter.dto;
+
+public class LetterResponseDto {
 }
