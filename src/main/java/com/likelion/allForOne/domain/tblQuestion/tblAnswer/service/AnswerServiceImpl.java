@@ -1,8 +1,6 @@
 package com.likelion.allForOne.domain.tblQuestion.tblAnswer.service;
 
 import com.likelion.allForOne.domain.tblGroupMember.GroupMemberServiceImpl;
-import com.likelion.allForOne.domain.tblQuestion.dto.QuestionDto;
-import com.likelion.allForOne.domain.tblQuestion.dto.QuestionResponseDto;
 import com.likelion.allForOne.domain.tblQuestion.tblAnswer.TblAnswerRepository;
 import com.likelion.allForOne.domain.tblQuestion.tblAnswer.dto.AnswerDto;
 import com.likelion.allForOne.entity.TblAnswer;

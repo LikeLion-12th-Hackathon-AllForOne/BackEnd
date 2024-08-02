@@ -15,10 +15,6 @@ public class GroupRequestDto {
         private String groupInviteCode;
     }
     @Data
-    public static class findGroupDetail {
-        private Long groupSeq;
-    }
-    @Data
     public static class updateRole {
         private Long groupSeq;
         private Long codeCategoryRoleSeq;
