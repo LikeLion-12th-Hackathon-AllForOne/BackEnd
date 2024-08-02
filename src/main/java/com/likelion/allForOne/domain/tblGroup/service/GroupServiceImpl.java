@@ -241,7 +241,7 @@ public class GroupServiceImpl implements GroupService {
         for(TblGroupMember entity : groupMemberList){
             profileList.add(GroupMemberDto.profile.builder()
                     .memberSeq(entity.getMemberSeq())
-                    .userName(entity.getUser().getUserName())
+                    .userName(groupMemberService.findMemberTargetName(entity))
                     .userBirth(entity.getUser().getUserBirth())
                     .userPhone(entity.getUser().getUserPhone())
                     .codeName(entity.getUser().getCodeMbti().getCodeName())
