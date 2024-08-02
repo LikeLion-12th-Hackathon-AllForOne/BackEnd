@@ -52,7 +52,7 @@ public class QuestionController {
     }
 
     /**
-     * 오늘의 질문 답변(임시저장 or 저장)
+     * 오늘의 질문 답변(임시저장 or 저장) 조회
      * @param usedQuestionSeq Long: 오늘의 질문 구분자
      * @param memberSeq Long: 멤버 구분자
      * @return ResponseEntity<?>
@@ -63,6 +63,30 @@ public class QuestionController {
         HttpSession session = request.getSession(false);
         Long userSeq = (Long) session.getAttribute("userSeq");
         return ResponseEntity.ok().body(questionService.findTodayQandA(usedQuestionSeq, memberSeq, userSeq));
+    }
+
+    /**
+     * 지난 오늘의 퀴즈 모아보기 (7개씩)
+     * @param groupSeq Long: 방(그룹) 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/last/{groupSeq}/questionList/{inpDate}")
+    public ResponseEntity<?> findLastQandA(@PathVariable("groupSeq") Long groupSeq, @PathVariable("inpDate") String inpDate){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.findLastQandA(groupSeq, userSeq, inpDate));
+    }
+
+    /**
+     * 특정 그룹에서 특정인에 대한 퀴즈 모아보기
+     * @param memberTargetSeq Long: 질문 대상자 멤버 구분자
+     * @return ResponseEntity<?>
+     */
+    @GetMapping("/someone/{memberTargetSeq}/questionList/{inpDate}")
+    public ResponseEntity<?> findSomeoneQAndA(@PathVariable("memberTargetSeq") Long memberTargetSeq, @PathVariable("inpDate") String inpDate){
+        HttpSession session = request.getSession(false);
+        Long userSeq = (Long) session.getAttribute("userSeq");
+        return ResponseEntity.ok().body(questionService.findSomeoneQAndA(memberTargetSeq, userSeq, inpDate));
     }
 
 }

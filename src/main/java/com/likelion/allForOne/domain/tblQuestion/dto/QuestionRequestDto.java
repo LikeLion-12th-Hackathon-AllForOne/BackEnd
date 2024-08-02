@@ -1,5 +1,6 @@
 package com.likelion.allForOne.domain.tblQuestion.dto;
 
+import com.likelion.allForOne.domain.tblQuestion.tblAnswer.dto.AnswerDto;
 import lombok.Data;
 
 import java.util.List;

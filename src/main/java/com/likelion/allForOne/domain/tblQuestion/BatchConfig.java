@@ -25,7 +25,7 @@ public class BatchConfig {
      * 매일 자정에 오늘의 문제 생성하는 배치 코드
      */
     @Transactional
-//    @Scheduled(cron = "30 3 0 * * *") //(초 분 시 일 월 요일)
+//    @Scheduled(cron = "30 41 12 * * *") //(초 분 시 일 월 요일)
     @Scheduled(cron = "0 0 0 * * *") //(초 분 시 일 월 요일)
     public void createTodayQuestion(){
         //1. 문제 생성일 조회

@@ -53,7 +53,7 @@ public class GroupMemberServiceImpl {
      * @return List<TblGroupMember>:특정 사용자의 그룹회원 리스트
      */
     public List<TblGroupMember> findListGroupMemberByGroup(Long groupSeq){
-        return groupMemberRepository.findByGroup_GroupSeq(groupSeq);
+        return groupMemberRepository.findByGroup_GroupSeqOrderByUser_UserName(groupSeq);
     }
 
     /**
@@ -103,5 +103,18 @@ public class GroupMemberServiceImpl {
      */
     public TblGroupMember findByGroupMemberSeq(Long memberSeq){
         return groupMemberRepository.findById(memberSeq).orElse(null);
+    }
+
+    /**
+     * 방(그룹) 역할에 맞는 멤버 이름 출력하기
+     * @param memberTarget TblGroupMember: 멤버 entity
+     * @return String 출력될 이름
+     */
+    public String findMemberTargetName(TblGroupMember memberTarget){
+        TblCode codeCategoryRole = memberTarget.getCodeCategoryRole();
+        if (codeCategoryRole.getCodeSeq() == 38
+                || codeCategoryRole.getCodeSeq() == 39)
+            return codeCategoryRole.getCodeName();
+        else return memberTarget.getUser().getUserName();
     }
 }
