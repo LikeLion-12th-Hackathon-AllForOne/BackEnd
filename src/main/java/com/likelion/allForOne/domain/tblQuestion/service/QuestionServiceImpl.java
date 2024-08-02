@@ -218,34 +218,25 @@ public class QuestionServiceImpl implements QuestionService {
                 || !todayQuestionOpt.get().getInpDate().equals(LocalDate.now()))
             return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
 
-        //3. 질문 정리
+        //3. 방(그룹)에 속한 멤버 리스트
+        List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupEntity.getGroupSeq());
+
+        //4. 질문 정리
         TblUsedQuestion todayQuestion = todayQuestionOpt.get();
         QuestionDto.OrganizeQuestion question = organizeUsedQuestion(usedQuestionSeq);
 
-        //4. 질문 유형에 따라 답변 한개 또는 리스트
-        List<AnswerDto.BasedOnAnswerForm> answerFormList = new ArrayList<>();
-        if (todayQuestion.getCodeQuestionType().getCodeSeq() == 28L) {
-            //5. 여러명에 대한 답변(리스트)이 필요한 경우
-            List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupEntity.getGroupSeq());
-            for(TblGroupMember memberTarget : groupMemberList){
-                //6. 전체질문(28번 유형 질문)의 경우, 자신을 제외한 나머지에 대해 답변을 달아야함.
-                if(memberTarget.getMemberSeq().equals(memberSeq)) continue;
-                answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, memberSeq, memberTarget));
-            }
-        } else {
-            //7. 답변 한개 질문의 경우,
-            TblGroupMember memberTarget = todayQuestion.getMemberTarget();
-            answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, memberSeq, memberTarget));
-        }
+        //5. 질문 유형에 따라 답변 한개 또는 리스트
+        List<AnswerDto.BasedOnAnswerForm> answerFormList
+                = answerService.findByBasedOnAnswer(todayQuestion, memberSeq, groupMemberList);
 
-        //8. 데이터 반환
+        //6. 데이터 반환
         return ApiResponse.SUCCESS(
                 SuccessCode.FOUND_IT,
                 new QuestionResponseDto.QuestionAndAnswer<>(question,answerFormList));
     }
 
     /**
-     * 지난 퀴즈 모아보기 (전체)
+     * 지난 오늘의 퀴즈 모아보기 (7개씩)
      * @param groupSeq Long: 방(그룹) 구분자
      * @param userSeq Long: 사용자 구분자
      * @return ApiResponse<?>
@@ -259,50 +250,21 @@ public class QuestionServiceImpl implements QuestionService {
         //2. 그룹에 속한 유저(멤버) 리스트 조회
         List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
 
-        //3. 오늘날짜를 제외한, 오늘의(제출된) 퀴즈 리스트 조회
+        //3. 미래의 데이터를 조회할수는 없음.
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate date = LocalDate.parse(inpDate, formatter);
         if(date.isAfter(LocalDate.now())) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
 
+        //4. inpDate 를 포함한 이후 6일간의 오늘의(제출된) 퀴즈 리스트, 총 7개 조회
         List<TblUsedQuestion> usedQuestionList
-                = usedQuestionRepository.findTop7ByInpDateBeforeAndGroup_GroupSeqOrderByInpDateDesc(date, groupSeq);
+                = usedQuestionRepository.findTop7ByInpDateLessThanEqualAndGroup_GroupSeqOrderByInpDateDesc(date, groupSeq);
 
-        //4. 각 퀴즈별 멤버들의 답변 조회
+        //5. 각 퀴즈별 멤버들의 답변 조회
         List<QuestionResponseDto.QuestionAndAnswer<?>> result = new ArrayList<>();
         for(TblUsedQuestion usedQuestionEntity : usedQuestionList)
             result.add(organizeQuestionAndAnswerAll(usedQuestionEntity, groupMemberList));
 
         return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
-    }
-
-    /**
-     * 날짜로 지난 퀴즈 조회하기
-     * @param groupSeq Long: 방(그룹) 구분자
-     * @param userSeq Long: 사용자 구분자
-     * @return ApiResponse<?>
-     */
-    @Override
-    public ApiResponse<?> findByInpDateLastQandA(Long groupSeq, Long userSeq, String inpDate) {
-        //1. 해당 유저가 그룹에 속한 유저인지 확인
-        boolean memberCheck = groupMemberService.checkGroupMember(groupSeq, userSeq);
-        if (!memberCheck) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
-
-        //2. 그룹에 속한 유저(멤버) 리스트 조회
-        List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
-
-        //3. 오늘날짜 이전의 데이터인지 확인
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate date = LocalDate.parse(inpDate, formatter);
-        if(!date.isBefore(LocalDate.now())) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
-
-        //4. 오늘의(제출된) 퀴즈 조회
-        Optional<TblUsedQuestion> usedQuestionOpt = usedQuestionRepository.findByInpDateAndGroup_GroupSeq(date, groupSeq);
-        if(usedQuestionOpt.isEmpty()) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
-
-        //5. 각 퀴즈별 멤버들의 답변 조회 및 반환
-        return ApiResponse.SUCCESS(
-                SuccessCode.FOUND_IT,
-                organizeQuestionAndAnswerAll(usedQuestionOpt.get(), groupMemberList));
     }
 
     /**
@@ -322,10 +284,10 @@ public class QuestionServiceImpl implements QuestionService {
         boolean userCheck = groupMemberService.checkGroupMember(groupSeq, userSeq);
         if(!userCheck) return ApiResponse.ERROR(ErrorCode.UNAUTHORIZED);
 
-        //3. 오늘날짜 이전만 조회 가능
+        //3. 미래의 데이터를 조회할수는 없음.
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate date = LocalDate.parse(inpDate, formatter);
-        if(!date.isBefore(LocalDate.now())) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
+        if(date.isAfter(LocalDate.now())) return ApiResponse.ERROR(ErrorCode.INVALID_PARAMETER);
 
         //4. 전체 질문과 멤버 구분자를 target 으로 하는 질문 조회하기
         List<TblUsedQuestion> targetQuestionList
@@ -342,27 +304,10 @@ public class QuestionServiceImpl implements QuestionService {
             QuestionDto.OrganizeQuestion organizeUsedQuestion = organizeUsedQuestion(usedQuestionSeq);
 
             //8. memberTarget 에 대한 멤버 전부의 답변 취합하기
-            List<AnswerDto.BasedOnTargetForm> answerFormList = new ArrayList<>();
-            if (usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L) {
-                for(TblGroupMember memberAnswer : groupMemberList){
-                    //9. 한명의 답변자가 각 멤버에 대한 답변을 작성하는 질문의 경우(전체질문(28번 유형 질문)의 경우), 답변을 본인 제외하고 조회
-                    if(memberAnswer.getMemberSeq().equals(memberTargetSeq)) continue;
-                    //10. 답변 조회
-                    answerFormList.add(answerService.organizeBasedOnTargetForm(usedQuestionSeq, memberAnswer, memberTargetSeq));
-                }
-            } else {
-                //12. 한명의 답변자가 한개의 답변을 작성하는 질문의 경우, 본인의 답변이 최상위 답으로 위치해야 함.
-                for(TblGroupMember memberAnswer : groupMemberList){
-                    //13. 저장된 답변 조회
-                    AnswerDto.BasedOnTargetForm basedOnTargetForm = answerService.organizeBasedOnTargetForm(usedQuestionSeq, memberAnswer, memberTargetSeq);
-
-                    //15. 본인이 한 답변은 항상 맨 위에 위치
-                    if(memberAnswer.getMemberSeq().equals(memberTargetSeq))
-                        answerFormList.add(0, basedOnTargetForm);
-                    else answerFormList.add(basedOnTargetForm);
-
-                }
-            }
+            List<AnswerDto.BasedOnTargetForm> answerFormList
+                    = answerService.findByBasedOnTarget(
+                            usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L,
+                            usedQuestionSeq, groupMemberList, memberTargetSeq);
             result.add(new QuestionResponseDto.QuestionAndAnswer<>(organizeUsedQuestion, answerFormList));
         }
 
@@ -441,18 +386,8 @@ public class QuestionServiceImpl implements QuestionService {
         List<AnswerDto.BasedOnAnswerFormList> memberAnswerList = new ArrayList<>();
         for(TblGroupMember groupAnswerMember : groupMemberList){
             Long groupAnswerMemberSeq = groupAnswerMember.getMemberSeq();
-            List<AnswerDto.BasedOnAnswerForm> answerFormList = new ArrayList<>();
-            if (usedQuestionEntity.getCodeQuestionType().getCodeSeq() == 28L) {
-                //3. 여러명에 대한 답변(리스트)이 필요한 경우
-                for(TblGroupMember memberTarget : groupMemberList){
-                    //4. 전체질문(28번 유형 질문)의 경우, 자신을 제외한 나머지에 대해 답변을 달아야함.
-                    if(memberTarget.getMemberSeq().equals(groupAnswerMemberSeq)) continue;
-                    answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, groupAnswerMemberSeq, memberTarget));
-                }
-            } else {
-                //5. 답변 한개 질문의 경우,
-                answerFormList.add(answerService.organizeBasedOnAnswerForm(usedQuestionSeq, groupAnswerMemberSeq, usedQuestionEntity.getMemberTarget()));
-            }
+            List<AnswerDto.BasedOnAnswerForm> answerFormList
+                    = answerService.findByBasedOnAnswer(usedQuestionEntity, groupAnswerMemberSeq, groupMemberList);
             //6. 멤버별 답변 DTO 정리
             memberAnswerList.add(AnswerDto.BasedOnAnswerFormList.builder()
                     .memberAnswerSeq(groupAnswerMemberSeq)
