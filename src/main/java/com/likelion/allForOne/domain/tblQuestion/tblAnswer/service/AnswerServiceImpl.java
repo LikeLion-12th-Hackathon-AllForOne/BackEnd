@@ -43,6 +43,7 @@ public class AnswerServiceImpl implements AnswerService{
         return AnswerDto.BasedOnAnswerForm.builder()
                 .memberTargetSeq(memberTargetSeq)
                 .memberTargetName(groupMemberService.findMemberTargetName(memberTargetEntity))
+                .answerTmpYn(bfAnswerOpt.map(TblAnswer::getAnswerTmpYn).orElse(2))
                 .answerSeq(bfAnswerOpt.map(TblAnswer::getAnswerSeq).orElse(null))
                 .answerContents(bfAnswerOpt.map(TblAnswer::getAnswerContents).orElse(null))
                 .build();
@@ -69,6 +70,7 @@ public class AnswerServiceImpl implements AnswerService{
         return AnswerDto.BasedOnTargetForm.builder()
                 .memberAnswerSeq(memberAnswerSeq)
                 .memberAnswerName(groupMemberService.findMemberTargetName(memberAnswerEntity))
+                .answerTmpYn(bfAnswerOpt.map(TblAnswer::getAnswerTmpYn).orElse(2))
                 .answerSeq(bfAnswerOpt.map(TblAnswer::getAnswerSeq).orElse(null))
                 .answerContents(bfAnswerOpt.map(TblAnswer::getAnswerContents).orElse(null))
                 .build();

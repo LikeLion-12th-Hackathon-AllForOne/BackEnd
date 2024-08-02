@@ -20,6 +20,7 @@ public class AnswerDto {
     public static class BasedOnAnswerForm {
         private Long memberTargetSeq;    //질문 대상자 구분자
         private String memberTargetName; //질문 대상자 이름
+        private int answerTmpYn;         //임시저장 여부(저장:0 / 임시저장:1 / 저장기록 없음:2)
         private Long answerSeq;          //답변구분자 (null 인 경우, 임시저장조차도 한적이 없다는 의미)
         private String answerContents;   //답변 내용
     }
@@ -29,6 +30,7 @@ public class AnswerDto {
     public static class BasedOnTargetForm {
         private Long memberAnswerSeq;    //질문 답변자 구분자
         private String memberAnswerName; //질문 답변자 이름
+        private int answerTmpYn;         //임시저장 여부(저장:0 / 임시저장:1 / 저장기록 없음:2)
         private Long answerSeq;          //답변구분자 (null 인 경우, 임시저장조차도 한적이 없다는 의미)
         private String answerContents;   //답변 내용
     }
