@@ -219,7 +219,7 @@ public class GroupServiceImpl implements GroupService {
         TblGroup group = groupOpt.get();
 
         //3. 편지보따리 달성도 조회
-        int achievePercent = letterPackageService.packageAchievePercent(groupSeq);
+        double achievePercent = letterPackageService.packageAchievePercent(groupSeq);
 
         //4. 오늘의 퀴즈 출제 상태 조회
         int questionStateVal = group.getCodeQuestionStateSeq().getCodeVal();

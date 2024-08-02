@@ -50,18 +50,15 @@ public class LetterPackageServiceImpl {
      * @param groupSeq Long: 그룹 구분자
      * @return int:달성도
      */
-    public int packageAchievePercent(Long groupSeq){
+    public double packageAchievePercent(Long groupSeq){
         Optional<TblLetterPackage> letterPackageOpt = letterPackageRepository.findByGroup_GroupSeq(groupSeq);
         if (letterPackageOpt.isEmpty()) return 0;
 
-        int packageCnt = letterPackageOpt.get().getPackageCnt();                //작성된 편지 개수
-        int packageObjective = letterPackageOpt.get().getPackageObjective();    //보따리 달성 개수
+        double packageCnt = letterPackageOpt.get().getPackageCnt();                //작성된 편지 개수
+        double packageObjective = letterPackageOpt.get().getPackageObjective();    //보따리 달성 개수
 
-        int achievePercent = (packageCnt*100)/packageObjective; //달성도
-        if (achievePercent == 100) return 100;
-        else if (achievePercent >= 75) return 75;
-        else if (achievePercent >= 50) return 50;
-        else return 0;
+        double achievePercent = packageCnt/packageObjective; //달성도
+        return Math.round(achievePercent * 10.0) / 10.0;
     }
 
 }
