@@ -28,4 +28,10 @@ public class LetterController {
     public ResponseEntity<?> searchLetterInfo(@RequestBody SearchLetterInfo searchLetterInfo, HttpSession session) {
         return ResponseEntity.ok().body(letterService.searchLetterInfo(searchLetterInfo, session));
     }
+
+    // 보낸 편지함 조회
+    @GetMapping("/api/letter/searchLetterTo")
+    public ResponseEntity<?> SearchLetterTo(@RequestBody SearchLetterTo searchLetterTo, HttpSession session) {
+        return ResponseEntity.ok().body(letterService.searchLetterTo(searchLetterTo, session));
+    }
 }
