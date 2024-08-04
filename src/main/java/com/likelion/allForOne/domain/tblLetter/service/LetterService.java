@@ -6,4 +6,6 @@ import jakarta.servlet.http.HttpSession;
 
 public interface LetterService {
     ApiResponse<?> createLetter(CreateLetterDto createLetterDto, HttpSession session); // 편지 등록
+
+    ApiResponse<?> searchLetterInfo(SearchLetterInfo searchLetterInfo, HttpSession session); // 편지 정보 조회
 }

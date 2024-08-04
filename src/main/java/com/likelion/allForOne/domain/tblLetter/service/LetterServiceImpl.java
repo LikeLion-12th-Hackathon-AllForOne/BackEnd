@@ -1,23 +1,26 @@
 package com.likelion.allForOne.domain.tblLetter.service;
 
+import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
 import com.likelion.allForOne.domain.tblGroupMember.TblGroupMemberRepository;
 import com.likelion.allForOne.domain.tblLetter.TblLetterRepository;
 import com.likelion.allForOne.domain.tblLetter.dto.LetterRequestDto.*;
+import com.likelion.allForOne.domain.tblLetter.dto.LetterResponseDto;
+import com.likelion.allForOne.domain.tblLetterPaper.LetterPaperResponseDto;
 import com.likelion.allForOne.domain.tblLetterPaper.TblLetterPaperRepository;
 import com.likelion.allForOne.domain.tblUser.TblUserRepository;
-import com.likelion.allForOne.entity.TblGroupMember;
-import com.likelion.allForOne.entity.TblLetter;
-import com.likelion.allForOne.entity.TblLetterPaper;
-import com.likelion.allForOne.entity.TblUser;
+import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -28,6 +31,7 @@ public class LetterServiceImpl implements LetterService{
     private final TblLetterRepository letterRepository;
     private final TblLetterPaperRepository letterPaperRepository;
     private final TblGroupMemberRepository groupMemberRepository;
+    private final TblCodeRepository codeRepository;
 
     /**
      * 편지 등록
@@ -91,6 +95,53 @@ public class LetterServiceImpl implements LetterService{
                         return ApiResponse.SUCCESS(SuccessCode.CREATE_LETTER);
                     } else return ApiResponse.ERROR(ErrorCode.CREATE_LETTER_FAIL);
                 } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
+
+    /**
+     * 편지 정보 조회
+     * @param searchLetterInfo
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    public ApiResponse<?> searchLetterInfo(SearchLetterInfo searchLetterInfo, HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                String letterFrom = session.getAttribute("userId").toString(); // 보내는 사람 ID
+                String letterTo = searchLetterInfo.getLetter_to();                // 받는 사람 ID
+                String code = searchLetterInfo.getLetter_read();
+
+                // 코드 값 조회
+                TblCode codePaper = codeRepository.findByCodeSeq(Long.valueOf(code));
+                if (codePaper == null) return ApiResponse.ERROR(ErrorCode.CODE_NOT_FOUND);
+
+                // 무료 편지지만 조회
+                List<LetterPaperResponseDto.searchLetterPaperInfo> letterInfo = new ArrayList<>();
+                List<TblLetterPaper> letterPaper = letterPaperRepository.findByCodePaper(codePaper);
+                if (letterPaper == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                for (TblLetterPaper entity : letterPaper) {
+                    letterInfo.add(LetterPaperResponseDto.searchLetterPaperInfo.builder()
+                            .paperSeq(entity.getPaperSeq())
+                            .paperFileName(entity.getPaperFileName())
+                            .build());
+                }
+
+                LetterResponseDto.searchLetterInfo result = LetterResponseDto.searchLetterInfo.builder()
+                        .letterFrom(letterFrom)
+                        .letterTo(letterTo)
+                        .letterPaper(letterInfo)
+                        .build();
+
+                // 조회 결과 리턴
+                return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
             } else {
                 log.error("세션이 만료되었습니다.");
                 return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);

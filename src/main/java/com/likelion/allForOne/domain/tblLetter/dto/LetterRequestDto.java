@@ -20,4 +20,13 @@ public class LetterRequestDto {
         private String member_from;      // 보낸 사람 구분자
         private String paper_seq;        // 편지지 구분자
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SearchLetterInfo {
+        private String letter_to;        // 누구에게
+        private String letter_read;      // 편지 읽음 여부
+    }
 }
