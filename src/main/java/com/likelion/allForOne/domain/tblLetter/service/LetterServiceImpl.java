@@ -3,6 +3,7 @@ package com.likelion.allForOne.domain.tblLetter.service;
 import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
 import com.likelion.allForOne.domain.tblGroupMember.TblGroupMemberRepository;
 import com.likelion.allForOne.domain.tblLetter.TblLetterRepository;
+import com.likelion.allForOne.domain.tblLetter.dto.LetterRequestDto;
 import com.likelion.allForOne.domain.tblLetter.dto.LetterRequestDto.*;
 import com.likelion.allForOne.domain.tblLetter.dto.LetterResponseDto;
 import com.likelion.allForOne.domain.tblLetterPaper.LetterPaperResponseDto;
@@ -139,6 +140,53 @@ public class LetterServiceImpl implements LetterService{
                         .letterTo(letterTo)
                         .letterPaper(letterInfo)
                         .build();
+
+                // 조회 결과 리턴
+                return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
+
+    /**
+     * 받은 편지함 조회
+     * @param searchLetterTo
+     * @param session
+     * @return
+     */
+    public ApiResponse<?> searchLetterTo(SearchLetterTo searchLetterTo, HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                String letterTo = session.getAttribute("userId").toString(); // 보내는 사람 ID
+                int memberTo = Integer.parseInt(searchLetterTo.getMember_to()); // 받는 사람 ID
+
+                // 받은 편지함 조회
+                List<LetterRequestDto.searchLetterList> letterList = new ArrayList<>();
+                List<TblLetter> letterInfo = letterRepository.searchTblLetterByMemberToAndLetterTo(memberTo, letterTo);
+                if (letterInfo == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                for (TblLetter letter : letterInfo) {
+                    letterList.add(LetterRequestDto.searchLetterList.builder()
+                            .letter_seq(letter.getLetterSeq())
+                            .letter_to(letter.getLetterTo())
+                            .letter_from(letter.getLetterFrom())
+                            .letter_contents(letter.getLetterContents())
+                            .letter_read(String.valueOf(letter.getLetterRead()))
+                            .member_to(letter.getMemberTo().getMemberSeq().toString())
+                            .member_from(letter.getMemberFrom().getMemberSeq().toString())
+                            .paper_seq(letter.getPaperSeq().getPaperSeq().toString())
+                            .build());
+                }
+
+                LetterResponseDto.searchLetterList result = LetterResponseDto.searchLetterList.builder()
+                        .letterList(letterList)
+                        .build();
+
+                log.info("받은 편지함 조회, 사용자 ID {}", letterTo);
 
                 // 조회 결과 리턴
                 return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
