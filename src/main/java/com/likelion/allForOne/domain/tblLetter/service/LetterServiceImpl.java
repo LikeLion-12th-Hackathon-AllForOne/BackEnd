@@ -58,24 +58,17 @@ public class LetterServiceImpl implements LetterService{
                         return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
                     }
 
-                    // memberTo 사용자 조회
-                    Optional<TblUser> userTo = Optional.ofNullable(userRepository.findByUserId(createLetterDto.getLetter_to()));
-                    if (!userTo.isPresent()) {
-                        log.info("사용자 조회 실패, 사용자 ID {}", createLetterDto.getLetter_to());
-                        return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
-                    }
-
                     // 그룹 멤버 조회 1 - memberTo
-                    Optional<TblGroupMember> memberTo = groupMemberRepository.findById(userTo.get().getUserSeq());
+                    Optional<TblGroupMember> memberTo = groupMemberRepository.findByMemberSeq(Long.valueOf(createLetterDto.getMember_to()));
                     if (!memberTo.isPresent()) {
-                        log.info("그룹 멤버 (To) 조회 실패, 사용자 Seq {}", userTo.get().getUserSeq());
+                        log.info("그룹 멤버 (To) 조회 실패, 사용자 Seq {}", createLetterDto.getMember_to());
                         return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
                     }
 
                     // 그룹 멤버 조회 2 - memberFrom
-                    Optional<TblGroupMember> memberFrom = groupMemberRepository.findById(userSeq);
+                    Optional<TblGroupMember> memberFrom = groupMemberRepository.findByMemberSeq(Long.valueOf(createLetterDto.getMember_from()));
                     if (!memberFrom.isPresent()) {
-                        log.info("그룹 멤버 (From) 조회 실패, 사용자 Seq {}", userSeq);
+                        log.info("그룹 멤버 (From) 조회 실패, 사용자 Seq {}", createLetterDto.getMember_from());
                         return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
                     }
 
@@ -118,10 +111,10 @@ public class LetterServiceImpl implements LetterService{
             if (session.getAttribute("userId") != null) {
                 String letterFrom = session.getAttribute("userId").toString(); // 보내는 사람 ID
                 String letterTo = searchLetterInfo.getLetter_to();                // 받는 사람 ID
-                String code = searchLetterInfo.getLetter_read();
+                String code_paper = searchLetterInfo.getCode_paper();
 
-                // 코드 값 조회
-                TblCode codePaper = codeRepository.findByCodeSeq(Long.valueOf(code));
+                // 코드 값 조회 (유료 / 무료 코드 값)
+                TblCode codePaper = codeRepository.findByCodeSeq(Long.valueOf(code_paper));
                 if (codePaper == null) return ApiResponse.ERROR(ErrorCode.CODE_NOT_FOUND);
 
                 // 무료 편지지만 조회
@@ -140,6 +133,8 @@ public class LetterServiceImpl implements LetterService{
                         .letterTo(letterTo)
                         .letterPaper(letterInfo)
                         .build();
+
+                log.info("편지 정보 조회 완료, To > {}, From > {}", letterTo, letterFrom);
 
                 // 조회 결과 리턴
                 return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
