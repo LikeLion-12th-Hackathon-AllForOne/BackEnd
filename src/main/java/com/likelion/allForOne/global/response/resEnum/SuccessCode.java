@@ -15,6 +15,7 @@ public enum SuccessCode {
     PASSWORD_CORRECT(200, "비밀번호가 일치합니다."),
     SAVE_ANSWER(200, "답변이 저장되었습니다."),
     SAVE_SOME_ANSWER(200, "답변중 일부만 저장되었습니다."),
+    UPDATE_READ_LETTER(200, "읽음 처리 되었습니다."),
     CREATE_GROUP(201, "방(그룹)이 생성되었습니다."),
     CREATE_LETTER(201, "편지가 등록되었습니다."),
     CREATE_QUESTION(201, "질문이 생성되었습니다."),

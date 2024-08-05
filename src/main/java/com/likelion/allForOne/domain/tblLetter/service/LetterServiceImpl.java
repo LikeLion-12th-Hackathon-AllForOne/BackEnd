@@ -220,4 +220,44 @@ public class LetterServiceImpl implements LetterService{
             return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
         }
     }
+
+    /**
+     * 읽음 처리
+     * @param updateReadLetter
+     * @param session
+     * @return ApiResponse<?>
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> updateReadLetter(UpdateReadLetter updateReadLetter, HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                Long letterSeq = updateReadLetter.getLetter_seq();
+
+                // 읽음 처리
+                Optional<TblLetter> letterEntity = letterRepository.findById(letterSeq);
+
+                TblLetter letter = TblLetter.builder()
+                        .letterSeq(letterEntity.get().getLetterSeq())
+                        .letterTo(letterEntity.get().getLetterTo())
+                        .letterFrom(letterEntity.get().getLetterFrom())
+                        .letterContents(letterEntity.get().getLetterContents())
+                        .letterRead(1)
+                        .memberTo(letterEntity.get().getMemberTo())
+                        .memberFrom(letterEntity.get().getMemberFrom())
+                        .paperSeq(letterEntity.get().getPaperSeq())
+                        .build();
+                letterRepository.save(letter);
+
+                log.info("읽음 처리 완료, letterSeq {}", letterSeq);
+                return ApiResponse.SUCCESS(SuccessCode.UPDATE_READ_LETTER);
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
 }

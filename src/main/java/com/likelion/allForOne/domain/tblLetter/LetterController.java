@@ -34,4 +34,10 @@ public class LetterController {
     public ResponseEntity<?> searchLetterList(@RequestBody SearchLetterList searchLetterList, HttpSession session) {
         return ResponseEntity.ok().body(letterService.searchLetterList(searchLetterList, session));
     }
+
+    // 읽음 처리
+    @PostMapping("/api/letter/updateReadLetter")
+    public ResponseEntity<?> updateReadLetter(@RequestBody UpdateReadLetter updateReadLetter, HttpSession session) {
+        return ResponseEntity.ok().body(letterService.updateReadLetter(updateReadLetter, session));
+    }
 }
