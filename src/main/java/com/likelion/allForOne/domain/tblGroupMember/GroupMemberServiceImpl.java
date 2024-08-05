@@ -112,8 +112,10 @@ public class GroupMemberServiceImpl {
      */
     public String findMemberTargetName(TblGroupMember memberTarget){
         TblCode codeCategoryRole = memberTarget.getCodeCategoryRole();
-        if (codeCategoryRole.getCodeSeq() == 38
-                || codeCategoryRole.getCodeSeq() == 39)
+        if (codeCategoryRole == null) {
+            return memberTarget.getUser().getUserName()+"(역할 미선택)";
+        }else if (codeCategoryRole.getCodeSeq() == 38
+                    || codeCategoryRole.getCodeSeq() == 39)
             return codeCategoryRole.getCodeName();
         else return memberTarget.getUser().getUserName();
     }

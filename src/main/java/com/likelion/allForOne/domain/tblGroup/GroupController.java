@@ -63,7 +63,7 @@ public class GroupController {
     }
 
     /**
-     * 그룹 정보 상세 조회
+     * 그룹 정보 상세 조회(수정필요)
      * @param groupSeq Long:그룹 구분자
      * @return ResponseEntity<?>
      */
