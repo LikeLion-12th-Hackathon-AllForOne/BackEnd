@@ -1,11 +1,13 @@
 package com.likelion.allForOne.domain.tblLetter.service;
 
 import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
+import com.likelion.allForOne.domain.tblGroup.TblGroupRepository;
 import com.likelion.allForOne.domain.tblGroupMember.TblGroupMemberRepository;
 import com.likelion.allForOne.domain.tblLetter.TblLetterRepository;
 import com.likelion.allForOne.domain.tblLetter.dto.LetterRequestDto;
 import com.likelion.allForOne.domain.tblLetter.dto.LetterRequestDto.*;
 import com.likelion.allForOne.domain.tblLetter.dto.LetterResponseDto;
+import com.likelion.allForOne.domain.tblLetterPackage.TblLetterPackageRepository;
 import com.likelion.allForOne.domain.tblLetterPaper.LetterPaperResponseDto;
 import com.likelion.allForOne.domain.tblLetterPaper.TblLetterPaperRepository;
 import com.likelion.allForOne.domain.tblUser.TblUserRepository;
@@ -33,6 +35,8 @@ public class LetterServiceImpl implements LetterService{
     private final TblLetterPaperRepository letterPaperRepository;
     private final TblGroupMemberRepository groupMemberRepository;
     private final TblCodeRepository codeRepository;
+    private final TblGroupRepository groupRepository;
+    private final TblLetterPackageRepository letterPackageRepository;
 
     /**
      * 편지 등록
@@ -44,7 +48,6 @@ public class LetterServiceImpl implements LetterService{
     public ApiResponse<?> createLetter(CreateLetterDto createLetterDto, HttpSession session) {
         if (session != null) {
             if (session.getAttribute("userId") != null) {
-                Long userSeq = (Long) session.getAttribute("userSeq");
                 String userId = session.getAttribute("userId").toString();
 
                 if (!userId.isEmpty() || userId != null) {
@@ -84,8 +87,23 @@ public class LetterServiceImpl implements LetterService{
                                 .paperSeq(letterPaper.get())
                                 .build();
                         letterRepository.save(letter);
-
                         log.info("편지 등록 완료, 사용자 ID {}", userId);
+
+                        // 편지 보따리 추가
+                        Long groupSeq = Long.valueOf(createLetterDto.getGroup_seq());
+                        Optional<TblLetterPackage> letterPackageInfo = letterPackageRepository.findByGroup_GroupSeq(groupSeq);
+
+                        int packageCnt = letterPackageInfo.get().getPackageCnt() + 1; // 편지 보따리 개수 +1
+
+                        TblLetterPackage letterPackage = TblLetterPackage.builder()
+                                .packageSeq(letterPackageInfo.get().getPackageSeq())
+                                .packageObjective(letterPackageInfo.get().getPackageObjective())
+                                .packageCnt(packageCnt)
+                                .packageStartDate(letterPackageInfo.get().getPackageStartDate())
+                                .group(letterPackageInfo.get().getGroup())
+                                .build();
+                        letterPackageRepository.save(letterPackage);
+                        log.info("편지보따리 추가 완료");
                         return ApiResponse.SUCCESS(SuccessCode.CREATE_LETTER);
                     } else return ApiResponse.ERROR(ErrorCode.CREATE_LETTER_FAIL);
                 } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
