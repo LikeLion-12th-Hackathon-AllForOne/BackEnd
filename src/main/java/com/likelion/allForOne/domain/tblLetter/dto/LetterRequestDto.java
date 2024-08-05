@@ -27,7 +27,7 @@ public class LetterRequestDto {
     @Builder
     public static class SearchLetterInfo {
         private String letter_to;        // 누구에게
-        private String letter_read;      // 편지 읽음 여부
+        private String code_paper;      // 편지지 유료/무료 코드 값
     }
 
     @Getter
