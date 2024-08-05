@@ -12,4 +12,5 @@ public interface TblGroupMemberRepository extends JpaRepository<TblGroupMember, 
     Optional<TblGroupMember> findByGroup_GroupSeqAndUser_UserSeq(Long groupSeq, Long userSeq);
     Long countByGroup_GroupSeq(Long groupSeq);
     Optional<TblGroupMember> findByMemberSeq(Long memberSeq);
+    int deleteByUser_UserSeq(Long userSeq);
 }
