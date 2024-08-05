@@ -40,8 +40,19 @@ public class LetterRequestDto {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
-    public static class searchLetterList {
+    public static class SearchLetterList {
+        private String letter_to;        // 누구에게
+        private String member_to;        // 받는 사람 구분자
+        private String letter_from;        // 누구로부터
+        private String member_from;        // 보낸 사람 구분자
+    }
+
+    @Getter
+    @Builder
+    public static class SearchLetter {
         private Long letter_seq;         // 구분자
         private String letter_to;        // 누구에게
         private String letter_from;      // 누구로부터
