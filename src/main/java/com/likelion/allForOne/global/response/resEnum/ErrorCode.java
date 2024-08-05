@@ -13,6 +13,7 @@ public enum ErrorCode {
     INVALID_PARAMETER(400, HttpStatus.BAD_REQUEST, "파라미터 값을 다시 확인해주세요."),
     LOGIN_FAIL(400, HttpStatus.BAD_REQUEST, "로그인에 실패했습니다."),
     ALREADY_FULL(401, HttpStatus.UNAUTHORIZED, "입장가능 인원수가 초과되었습니다."),
+    NECESSARY_ROLL_CODE(401, HttpStatus.UNAUTHORIZED, "역할 배정이 필요합니다."),
     UNAUTHORIZED(401, HttpStatus.UNAUTHORIZED, "액세스 권한이 없습니다."),
     PASSWORD_INCORRECT(401, HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     SESSION_EXPIRED(403, HttpStatus.FORBIDDEN, "세션이 만료되었습니다."),

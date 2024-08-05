@@ -235,20 +235,32 @@ public class GroupServiceImpl implements GroupService {
         QuestionDto.OrganizeQuestion question =
                 questionStateVal == 1 ? questionService.organizeUsedQuestion(usedQuestionSeq) : null;
 
-        //6. 그룹멤버 프로필 조회 (수정필요)
+        //6. 그룹멤버 프로필 조회
         List<GroupMemberDto.profile> profileList = new ArrayList<>();
         List<TblGroupMember> groupMemberList = groupMemberService.findListGroupMemberByGroup(groupSeq);
         for(TblGroupMember entity : groupMemberList){
-            profileList.add(GroupMemberDto.profile.builder()
-                    .memberSeq(entity.getMemberSeq())
-                    .userName(groupMemberService.findMemberTargetName(entity))
-                    .userBirth(entity.getUser().getUserBirth())
-                    .userPhone(entity.getUser().getUserPhone())
-                    .codeName(entity.getUser().getCodeMbti().getCodeName())
-                    .build());
+            //7. 그룹 멤버 리스트 dto 정리
+            GroupMemberDto.profile groupMemberDto
+                    = GroupMemberDto.profile.builder()
+                        .memberSeq(entity.getMemberSeq())
+                        .userName(groupMemberService.findMemberTargetName(entity))
+                        .userBirth(entity.getUser().getUserBirth())
+                        .userPhone(entity.getUser().getUserPhone())
+                        .codeName(entity.getUser().getCodeMbti().getCodeName())
+                        .build();
+
+            //8. 조회하는 사용자가 그룹 리스트 최상단에 위치.
+            if (userSeq.equals(entity.getUser().getUserSeq())){
+                //9. 조회하는 사용자의 역할은 필수로 배정되어 있어야 함.
+                if (entity.getCodeCategoryRole() == null)
+                    return ApiResponse.ERROR(ErrorCode.NECESSARY_ROLL_CODE);
+                profileList.add(0, groupMemberDto);
+            } else
+                profileList.add(groupMemberDto);
+
         }
 
-        //7. 데이터 dto 전환
+        //10. 데이터 dto 전환
         GroupResponseDto.findGroupDetail result = GroupResponseDto.findGroupDetail.builder()
                 .ownerYn(userSeq.equals(group.getUserOwner().getUserSeq()))
                 .groupName(group.getGroupName())

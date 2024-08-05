@@ -64,7 +64,7 @@ insert into tbl_code (code_parent_seq, code_unit, code_name, code_val, create_da
 -- test data zip
 -- user
 insert into tbl_user (code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
-    values ( 6, now(), '20000123', 'admin', 'imgfile.jpg', '관리자', '01011111111', 'admin1234');
+    values ( 7, now(), '20000123', 'admin', 'imgfile.jpg', '관리자', '01011111111', 'admin1234');
 insert into tbl_user ( code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
     values ( 7, now(), '20000124', 'family1', 'imgfile.jpg', '부모', '01022222222', 'family1');
 insert into tbl_user ( code_mbti, create_date, user_birth, user_id, user_img, user_name, user_phone, user_pwd)
