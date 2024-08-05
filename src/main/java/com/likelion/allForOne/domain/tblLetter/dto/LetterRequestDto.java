@@ -19,6 +19,7 @@ public class LetterRequestDto {
         private String member_to;        // 받는 사람 구분자
         private String member_from;      // 보낸 사람 구분자
         private String paper_seq;        // 편지지 구분자
+        private String group_seq;        // 그룹 구분자
     }
 
     @Getter
@@ -62,4 +63,14 @@ public class LetterRequestDto {
         private String member_from;      // 보낸 사람 구분자
         private String paper_seq;        // 편지지 구분자
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateReadLetter {
+        private Long letter_seq;         // 구분자
+    }
+
+
 }

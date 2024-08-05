@@ -10,4 +10,6 @@ public interface LetterService {
     ApiResponse<?> searchLetterInfo(SearchLetterInfo searchLetterInfo, HttpSession session); // 편지 정보 조회
 
     ApiResponse<?> searchLetterList(SearchLetterList searchLetterList, HttpSession session); // 편지함 조회
+    
+    ApiResponse<?> updateReadLetter(UpdateReadLetter updateReadLetter, HttpSession session); // 읽음 처리
 }
