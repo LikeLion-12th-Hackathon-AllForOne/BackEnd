@@ -29,9 +29,9 @@ public class LetterController {
         return ResponseEntity.ok().body(letterService.searchLetterInfo(searchLetterInfo, session));
     }
 
-    // 보낸 편지함 조회
-    @GetMapping("/api/letter/searchLetterTo")
-    public ResponseEntity<?> SearchLetterTo(@RequestBody SearchLetterTo searchLetterTo, HttpSession session) {
-        return ResponseEntity.ok().body(letterService.searchLetterTo(searchLetterTo, session));
+    // 편지함 조회
+    @GetMapping("/api/letter/searchLetterList")
+    public ResponseEntity<?> searchLetterList(@RequestBody SearchLetterList searchLetterList, HttpSession session) {
+        return ResponseEntity.ok().body(letterService.searchLetterList(searchLetterList, session));
     }
 }

@@ -154,23 +154,49 @@ public class LetterServiceImpl implements LetterService{
     }
 
     /**
-     * 받은 편지함 조회
-     * @param searchLetterTo
+     * 편지함 조회
+     * @param searchLetterList
      * @param session
-     * @return
+     * @return ApiResponse<?>
      */
-    public ApiResponse<?> searchLetterTo(SearchLetterTo searchLetterTo, HttpSession session) {
+    @Override
+    public ApiResponse<?> searchLetterList(SearchLetterList searchLetterList, HttpSession session) {
         if (session != null) {
             if (session.getAttribute("userId") != null) {
-                String letterTo = session.getAttribute("userId").toString(); // 보내는 사람 ID
-                int memberTo = Integer.parseInt(searchLetterTo.getMember_to()); // 받는 사람 ID
+                String userId = session.getAttribute("userId").toString();
+                List<TblLetter> letterInfo;
+                int memberFrom = 0;
+                int memberTo = 0;
 
-                // 받은 편지함 조회
-                List<LetterRequestDto.searchLetterList> letterList = new ArrayList<>();
-                List<TblLetter> letterInfo = letterRepository.searchTblLetterByMemberToAndLetterTo(memberTo, letterTo);
-                if (letterInfo == null) return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                // 보낸 사람 값 여부 확인
+                if (searchLetterList.getMember_from() != null && searchLetterList.getMember_from() != "") memberFrom = Integer.parseInt(searchLetterList.getMember_from());
+
+                // 받는 사람 값 여부 확인
+                if (searchLetterList.getMember_to() != null && searchLetterList.getMember_to() != "") memberTo = Integer.parseInt(searchLetterList.getMember_to());
+
+                // 편지함 조회
+                if (memberFrom == 0 && memberTo != 0) {
+                    // 받은 편지함 조회
+                    log.info("받은 편지함 조회");
+                    letterInfo = letterRepository.searchTblLetterByMemberToAndLetterTo(memberTo, userId);
+                } else if (memberFrom != 0 && memberTo == 0){
+                    // 보낸 편지함 조회
+                    log.info("보낸 편지함 조회");
+                    letterInfo = letterRepository.searchTblLetterByMemberFromAndLetterFrom(memberFrom, userId);
+                } else {
+                    log.info("memberFrom, memberTo 값 모두 없음, 편지함 조회 실패");
+                    return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                }
+
+                if (letterInfo == null) {
+                    log.info("letterInfo null, 편지함 조회 실패");
+                    return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
+                }
+
+                // 편지함에서 조회한 값 dto로 변경
+                List<SearchLetter> letterList = new ArrayList<>();
                 for (TblLetter letter : letterInfo) {
-                    letterList.add(LetterRequestDto.searchLetterList.builder()
+                    letterList.add(SearchLetter.builder()
                             .letter_seq(letter.getLetterSeq())
                             .letter_to(letter.getLetterTo())
                             .letter_from(letter.getLetterFrom())
@@ -186,7 +212,7 @@ public class LetterServiceImpl implements LetterService{
                         .letterList(letterList)
                         .build();
 
-                log.info("받은 편지함 조회, 사용자 ID {}", letterTo);
+                log.info("편지함 조회 완료, 사용자 ID {}", userId);
 
                 // 조회 결과 리턴
                 return ApiResponse.SUCCESS(SuccessCode.FOUND_IT, result);
