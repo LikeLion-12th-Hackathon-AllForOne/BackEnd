@@ -10,7 +10,6 @@ import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
 import com.likelion.allForOne.login.utils.CustomUserDetails;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

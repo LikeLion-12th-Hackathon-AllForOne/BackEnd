@@ -2,7 +2,6 @@ package com.likelion.allForOne.domain.tblUser.service;
 
 import com.likelion.allForOne.domain.tblUser.dto.UserRequestDto.*;
 import com.likelion.allForOne.global.response.ApiResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 
 public interface UserService {

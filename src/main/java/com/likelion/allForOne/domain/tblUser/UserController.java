@@ -1,11 +1,8 @@
 package com.likelion.allForOne.domain.tblUser;
 
 import com.likelion.allForOne.domain.tblUser.service.UserServiceImpl;
-import jakarta.servlet.http.HttpSession;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
