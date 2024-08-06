@@ -190,11 +190,11 @@ public class LetterServiceImpl implements LetterService{
                 // 편지함 조회
                 if (memberFrom == 0 && memberTo != 0) {
                     // 받은 편지함 조회
-                    log.info("받은 편지함 조회");
+                    log.info("받은 편지함 조회 memberTo {}", memberTo);
                     letterInfo = letterRepository.searchTblLetterByMemberToAndLetterTo(memberTo, userId);
                 } else if (memberFrom != 0 && memberTo == 0){
                     // 보낸 편지함 조회
-                    log.info("보낸 편지함 조회");
+                    log.info("보낸 편지함 조회 memberFrom {}", memberFrom);
                     letterInfo = letterRepository.searchTblLetterByMemberFromAndLetterFrom(memberFrom, userId);
                 } else {
                     log.info("memberFrom, memberTo 값 모두 없음, 편지함 조회 실패");

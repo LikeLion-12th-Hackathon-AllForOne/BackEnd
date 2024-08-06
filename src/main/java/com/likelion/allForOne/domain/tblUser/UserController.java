@@ -23,7 +23,7 @@ public class UserController {
     }
 
     // ID 중복체크
-    @GetMapping("/api/user/checkIdDuplicate")
+    @PostMapping("/api/user/checkIdDuplicate")
     public ResponseEntity<?> checkIdDuplicate(@RequestBody JoinDto userJoinRequestDto) {
         return ResponseEntity.ok().body(userService.checkIdDuplicate(userJoinRequestDto.getUserId()));
     }
@@ -47,7 +47,7 @@ public class UserController {
     }
 
     // 내 정보 조회
-    @GetMapping("/api/user/searchUserInfo")
+    @PostMapping("/api/user/searchUserInfo")
     public ResponseEntity<?> searchUserInfo(HttpSession session) {
         return ResponseEntity.ok().body(userService.searchUserInfo(session));
     }
