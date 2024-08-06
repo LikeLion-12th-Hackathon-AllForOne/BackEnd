@@ -20,4 +20,6 @@ public interface UserService {
     ApiResponse<?> updateUserInfo(UpdateUserInfo updateUserInfo, HttpSession session); // 내 정보 수정
     
     ApiResponse<?> deleteUser(HttpSession session); // 회원 탈퇴
+
+    ApiResponse<?> updateUserImage(UpdateUserImage updateUserImage, HttpSession session); // 사용자 프로필 변경
 }

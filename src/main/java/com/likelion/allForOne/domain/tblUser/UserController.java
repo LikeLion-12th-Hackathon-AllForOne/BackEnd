@@ -63,4 +63,10 @@ public class UserController {
     public ResponseEntity<?> deleteUser(HttpSession session) {
         return ResponseEntity.ok().body(userService.deleteUser(session));
     }
+
+    // 사용자 프로필 변경
+    @PostMapping("/api/user/updateUserImage")
+    public ResponseEntity<?> updateUserImage(@RequestBody UpdateUserImage updateUserImage, HttpSession session) {
+        return ResponseEntity.ok().body(userService.updateUserImage(updateUserImage, session));
+    }
 }
