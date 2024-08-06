@@ -35,4 +35,20 @@ public class TblUser extends BaseEntity {
     @Comment(value="mbti 구분자")
     @JoinColumn(name = "code_mbti", nullable = false)
     private TblCode codeMbti;   //mbti 구분자
+
+
+
+    // ++ 추가된 컬럼
+    @Column(columnDefinition = "varchar(255) null comment 'jwt refreshToken'")
+    private String refreshToken;     //jwt refreshToken
+
+
+
+    /* =======================================================
+     * update
+     * ======================================================= */
+    // jwt 리프레시 토큰 update
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
 }
