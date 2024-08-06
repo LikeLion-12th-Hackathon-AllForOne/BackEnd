@@ -123,6 +123,7 @@ public class GroupServiceImpl implements GroupService {
 
             TblGroup group = groupOpt.get();
             list.add(GroupDto.participateInfo.builder()
+                            .groupSeq(entity.getGroup().getGroupSeq())
                             .memberSeq(entity.getMemberSeq())
                             .groupName(group.getGroupName())
                             .categoryName(group.getCodeCategory().getCodeName())

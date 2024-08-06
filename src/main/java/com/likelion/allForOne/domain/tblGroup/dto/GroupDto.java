@@ -8,6 +8,7 @@ public class GroupDto {
     @Getter
     @Builder
     public static class participateInfo {
+        private Long groupSeq;          //그룹구분자
         private Long memberSeq;         //그룹멤버구분자
         private String groupName;       //그룹명(방이름)
         private String categoryName;    //카테고리명
