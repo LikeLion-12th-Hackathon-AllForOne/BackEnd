@@ -30,3 +30,11 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
   paths-to-match:
+
+
+
+# jwt keys
+jwt:
+  secret:
+    ACCESS_TOKEN_KEY: likelion.allForOne.20240806.backend.dlwjdry.skarbfl
+    REFRESH_TOKEN_KEY: dk.ahfkahfkahkf.gkrl.rnl.cksg.ek.rndndndnd.zzzzdmgpgpgp
