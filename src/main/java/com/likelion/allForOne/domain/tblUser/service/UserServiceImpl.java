@@ -9,9 +9,11 @@ import com.likelion.allForOne.entity.TblUser;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
+import com.likelion.allForOne.login.utils.CustomUserDetails;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.likelion.allForOne.domain.tblUser.dto.UserRequestDto.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,67 +79,18 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 로그인
-     * @param loginDto
-     * @param session
-     * @return ApiResponse<?>
-     */
-    @Override
-    public ApiResponse<?> login(LoginDto loginDto, HttpSession session) {
-        if (loginDto != null) {
-            // 사용자 조회
-            Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(loginDto.getUserId()));
-
-            if (user.isPresent()) {
-                // 비밀번호 일치하는지 확인
-                if (user.get().getUserPwd().equals(loginDto.getUserPwd())) {
-                    // 세션값 저장
-                    session.setAttribute("userSeq", user.get().getUserSeq());
-                    session.setAttribute("userId", user.get().getUserId());
-                    session.setAttribute("userName", user.get().getUserName());
-                    session.setAttribute("userImg", user.get().getUserImg());
-                    session.setMaxInactiveInterval(30 * 60); // 30분 동안 세션 유지, 이후 자동 로그아웃
-
-                    log.info("로그인 성공, 사용자 ID {}", loginDto.getUserId());
-                    return ApiResponse.SUCCESS(SuccessCode.LOGIN_SUCCESS);
-                } else {
-                    log.error("로그인 실패 : 아이디, 비밀번호 불일치, 사용자 ID {}", loginDto.getUserId());
-                    return ApiResponse.ERROR(ErrorCode.LOGIN_FAIL); // 비밀번호 불일치 시 로그인 실패
-                }
-            } else {
-                log.error("로그인 실패 : 존재하지 않는 사용자, 사용자 ID {}", loginDto.getUserId());
-                return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);  // 존재하지 않는 사용자인 경우 Error
-            }
-        } else {
-            log.error("로그인 실패 : LoginDto가 비어 있습니다.");
-            return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND); // LoginDto 값 비어 있을 때
-        }
-    }
-
-    /**
-     * 로그아웃
-     * @param session
-     * @return ApiResponse<?>
-     */
-    @Override
-    public ApiResponse<?> logout(HttpSession session) {
-        // 세션 무효화
-        session.invalidate();
-        return ApiResponse.SUCCESS(SuccessCode.LOGOUT_SUCCESS);
-    }
-
-    /**
      * 비밀번호 확인
      * @param checkPwdDto
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
-    public ApiResponse<?> checkPwd(CheckPwdDto checkPwdDto, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
+    public ApiResponse<?> checkPwd(CheckPwdDto checkPwdDto, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
                 // 사용자 조회
-                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(userDetails.getUserId()));
 
                 if (user.isPresent()) {
                     // 비밀번호 일치 확인
@@ -161,16 +114,16 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 내 정보 조회
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
-    public ApiResponse<?> searchUserInfo(HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
+    public ApiResponse<?> searchUserInfo(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
                 // 사용자 조회
-                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
-
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(userDetails.getUserId()));
                 if (user.isPresent()) {
                     log.info("회원정보 조회 완료, 사용자 ID {}", user.get().getUserId());
 
@@ -201,16 +154,17 @@ public class UserServiceImpl implements UserService {
     /**
      * 내 정보 수정
      * @param updateUserInfo
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
     @Transactional
-    public ApiResponse<?> updateUserInfo(@RequestBody UpdateUserInfo updateUserInfo, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
+    public ApiResponse<?> updateUserInfo(@RequestBody UpdateUserInfo updateUserInfo, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
                 // 사용자 조회
-                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(userDetails.getUserId()));
 
                 if (user.isPresent()) {
                     // 코드 값 조회
@@ -245,16 +199,17 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 회원 탈퇴
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
     @Transactional
-    public ApiResponse<?> deleteUser(HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
+    public ApiResponse<?> deleteUser(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
                 // 사용자 조회
-                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(userDetails.getUserId()));
 
                 if (user.isPresent()) {
                     // 사용자가 속해있는 그룹 멤버 삭제
@@ -264,7 +219,7 @@ public class UserServiceImpl implements UserService {
                     // 사용자 삭제
                     userRepository.deleteById(user.get().getUserSeq());
                     
-                    log.info("회원 탈퇴 완료, 사용자 ID {}", session.getAttribute("userId"));
+                    log.info("회원 탈퇴 완료, 사용자 ID {}", userDetails.getUserId());
                     return ApiResponse.SUCCESS(SuccessCode.DELETE_USER);
                 } else return ApiResponse.ERROR(ErrorCode.RESOURCE_NOT_FOUND);
             } else {
@@ -280,18 +235,19 @@ public class UserServiceImpl implements UserService {
     /**
      * 사용자 프로필 변경
      * @param updateUserImage
-     * @param session
+     * @param authentication
      * @return
      */
     @Override
     @Transactional
-    public ApiResponse<?> updateUserImage(UpdateUserImage updateUserImage, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
+    public ApiResponse<?> updateUserImage(UpdateUserImage updateUserImage, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
                 String userImg = updateUserImage.getUserImg();
 
                 // 사용자 조회
-                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(userDetails.getUserId()));
 
                 // 사용자 프로필 변경
                 TblUser updateUser = TblUser.builder()
