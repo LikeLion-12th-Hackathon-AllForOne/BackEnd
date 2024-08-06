@@ -13,4 +13,10 @@ public interface TblLetterRepository extends JpaRepository<TblLetter, Long> {
             "where member_to = :memberTo " +
             "and letter_to = :letterTo ", nativeQuery = true)
     List<TblLetter> searchTblLetterByMemberToAndLetterTo(@Param("memberTo") int memberTo, @Param("letterTo") String letterTo);
+
+    @Query(value="select * " +
+            "from tbl_letter " +
+            "where member_from = :memberFrom " +
+            "and letter_from = :letterFrom ", nativeQuery = true)
+    List<TblLetter> searchTblLetterByMemberFromAndLetterFrom(@Param("memberFrom") int memberFrom, @Param("letterFrom") String letterFrom);
 }

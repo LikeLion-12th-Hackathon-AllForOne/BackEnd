@@ -1,6 +1,7 @@
 package com.likelion.allForOne.domain.tblUser.service;
 
 import com.likelion.allForOne.domain.tblCode.TblCodeRepository;
+import com.likelion.allForOne.domain.tblGroupMember.TblGroupMemberRepository;
 import com.likelion.allForOne.domain.tblUser.TblUserRepository;
 import com.likelion.allForOne.domain.tblUser.dto.UserResponseDto;
 import com.likelion.allForOne.entity.TblCode;
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final TblUserRepository userRepository;
     private final TblCodeRepository codeRepository;
+    private final TblGroupMemberRepository groupMemberRepository;
 
     /**
      * 회원가입
@@ -255,6 +257,10 @@ public class UserServiceImpl implements UserService {
                 Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
 
                 if (user.isPresent()) {
+                    // 사용자가 속해있는 그룹 멤버 삭제
+                    groupMemberRepository.deleteByUser_UserSeq(user.get().getUserSeq());
+                    log.info("사용자가 속해있는 그룹 멤버 삭제");
+
                     // 사용자 삭제
                     userRepository.deleteById(user.get().getUserSeq());
                     

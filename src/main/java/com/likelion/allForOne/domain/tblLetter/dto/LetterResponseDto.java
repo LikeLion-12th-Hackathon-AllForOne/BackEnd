@@ -20,6 +20,6 @@ public class LetterResponseDto {
     @Getter
     @Builder
     public static class searchLetterList {
-        private List<LetterRequestDto.searchLetterList> letterList;
+        private List<LetterRequestDto.SearchLetter> letterList;
     }
 }

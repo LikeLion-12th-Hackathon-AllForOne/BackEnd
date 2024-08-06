@@ -19,6 +19,7 @@ public class LetterRequestDto {
         private String member_to;        // 받는 사람 구분자
         private String member_from;      // 보낸 사람 구분자
         private String paper_seq;        // 편지지 구분자
+        private String group_seq;        // 그룹 구분자
     }
 
     @Getter
@@ -27,7 +28,7 @@ public class LetterRequestDto {
     @Builder
     public static class SearchLetterInfo {
         private String letter_to;        // 누구에게
-        private String letter_read;      // 편지 읽음 여부
+        private String code_paper;      // 편지지 유료/무료 코드 값
     }
 
     @Getter
@@ -40,8 +41,19 @@ public class LetterRequestDto {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
-    public static class searchLetterList {
+    public static class SearchLetterList {
+        private String letter_to;        // 누구에게
+        private String member_to;        // 받는 사람 구분자
+        private String letter_from;        // 누구로부터
+        private String member_from;        // 보낸 사람 구분자
+    }
+
+    @Getter
+    @Builder
+    public static class SearchLetter {
         private Long letter_seq;         // 구분자
         private String letter_to;        // 누구에게
         private String letter_from;      // 누구로부터
@@ -51,4 +63,14 @@ public class LetterRequestDto {
         private String member_from;      // 보낸 사람 구분자
         private String paper_seq;        // 편지지 구분자
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateReadLetter {
+        private Long letter_seq;         // 구분자
+    }
+
+
 }

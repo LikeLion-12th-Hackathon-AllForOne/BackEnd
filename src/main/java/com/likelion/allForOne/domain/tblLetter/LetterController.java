@@ -6,10 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,14 +21,20 @@ public class LetterController {
     }
 
     // 편지 정보 조회
-    @GetMapping("/api/letter/searchLetterInfo")
+    @PostMapping("/api/letter/searchLetterInfo")
     public ResponseEntity<?> searchLetterInfo(@RequestBody SearchLetterInfo searchLetterInfo, HttpSession session) {
         return ResponseEntity.ok().body(letterService.searchLetterInfo(searchLetterInfo, session));
     }
 
-    // 보낸 편지함 조회
-    @GetMapping("/api/letter/searchLetterTo")
-    public ResponseEntity<?> SearchLetterTo(@RequestBody SearchLetterTo searchLetterTo, HttpSession session) {
-        return ResponseEntity.ok().body(letterService.searchLetterTo(searchLetterTo, session));
+    // 편지함 조회
+    @PostMapping("/api/letter/searchLetterList")
+    public ResponseEntity<?> searchLetterList(@RequestBody SearchLetterList searchLetterList, HttpSession session) {
+        return ResponseEntity.ok().body(letterService.searchLetterList(searchLetterList, session));
+    }
+
+    // 읽음 처리
+    @PostMapping("/api/letter/updateReadLetter")
+    public ResponseEntity<?> updateReadLetter(@RequestBody UpdateReadLetter updateReadLetter, HttpSession session) {
+        return ResponseEntity.ok().body(letterService.updateReadLetter(updateReadLetter, session));
     }
 }
