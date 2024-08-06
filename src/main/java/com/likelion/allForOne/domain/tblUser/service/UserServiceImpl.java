@@ -276,4 +276,45 @@ public class UserServiceImpl implements UserService {
             return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
         }
     }
+
+    /**
+     * 사용자 프로필 변경
+     * @param updateUserImage
+     * @param session
+     * @return
+     */
+    @Override
+    @Transactional
+    public ApiResponse<?> updateUserImage(UpdateUserImage updateUserImage, HttpSession session) {
+        if (session != null) {
+            if (session.getAttribute("userId") != null) {
+                String userImg = updateUserImage.getUserImg();
+
+                // 사용자 조회
+                Optional<TblUser> user = Optional.ofNullable(userRepository.findByUserId(session.getAttribute("userId").toString()));
+
+                // 사용자 프로필 변경
+                TblUser updateUser = TblUser.builder()
+                        .userSeq(user.get().getUserSeq())
+                        .userId(user.get().getUserId())
+                        .userPwd(user.get().getUserPwd())
+                        .userName(user.get().getUserName())
+                        .userBirth(user.get().getUserBirth())
+                        .userPhone(user.get().getUserPhone())
+                        .userImg(userImg)
+                        .codeMbti(user.get().getCodeMbti())
+                        .build();
+                userRepository.save(updateUser);
+
+                log.info("사용자 프로필 변경되었습니다. IMG 명 {}", userImg);
+                return ApiResponse.SUCCESS(SuccessCode.UPDATE_USER_IMG);
+            } else {
+                log.error("세션이 만료되었습니다.");
+                return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+            }
+        } else {
+            log.error("세션이 만료되었습니다.");
+            return ApiResponse.ERROR(ErrorCode.SESSION_EXPIRED);
+        }
+    }
 }

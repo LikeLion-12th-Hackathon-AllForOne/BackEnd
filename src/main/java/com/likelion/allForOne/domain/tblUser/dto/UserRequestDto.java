@@ -55,5 +55,13 @@ public class UserRequestDto {
         private String userImg;
         private String codeMbti;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateUserImage {
+        private String userImg;
+    }
 }
 
