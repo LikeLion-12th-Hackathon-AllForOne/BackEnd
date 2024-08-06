@@ -25,24 +25,11 @@ public class SecurityConfig {
     private String refreshTokenKey;
 
     private static final String[] AUTH_WHITELIST = {
-            "/api/login/**"
+            "/api/login/**", "/api/code/**"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws  Exception{
-//        return httpSecurity
-//                .httpBasic().disable()
-//                .csrf().disable()
-//                .cors().and()
-//                .authorizeHttpRequests()
-//                .requestMatchers("/api/login/**").permitAll()
-//                .requestMatchers("/api/pw486/**").authenticated()
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt 사용하는 경우 사용
-//                .and()
-//                .addFilterBefore(new JwtFilter(loginService, accessTokenKey), UsernamePasswordAuthenticationFilter.class)
-//                .build();
         //CSRF, CORS
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.cors(Customizer.withDefaults());

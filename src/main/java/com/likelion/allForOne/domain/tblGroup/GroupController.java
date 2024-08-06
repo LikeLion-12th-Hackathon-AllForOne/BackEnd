@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/group")
 public class GroupController {
     private final GroupServiceImpl groupService;
-    private final HttpServletRequest request;
 
     /**
      * 방(그룹) 생성

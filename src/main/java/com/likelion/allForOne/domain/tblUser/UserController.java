@@ -29,16 +29,16 @@ public class UserController {
     }
 
     // 로그인
-    @PostMapping("/api/user/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto, HttpSession session) {
-        return ResponseEntity.ok().body(userService.login(loginDto, session));
-    }
+//    @PostMapping("/api/user/login")
+//    public ResponseEntity<?> login(@RequestBody LoginDto loginDto, HttpSession session) {
+//        return ResponseEntity.ok().body(userService.login(loginDto, session));
+//    }
 
     // 로그아웃
-    @PostMapping("/api/user/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        return ResponseEntity.ok().body(userService.logout(session));
-    }
+//    @PostMapping("/api/user/logout")
+//    public ResponseEntity<?> logout(HttpSession session) {
+//        return ResponseEntity.ok().body(userService.logout(session));
+//    }
 
     // 비밀번호 확인
     @PostMapping("/api/user/checkPwd")
