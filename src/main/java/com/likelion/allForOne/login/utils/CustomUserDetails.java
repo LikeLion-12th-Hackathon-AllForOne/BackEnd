@@ -12,15 +12,16 @@ import java.util.List;
 @Builder
 public class CustomUserDetails implements UserDetails {
 
-    private Long userSeq;
-    private String nickname;
-    private String email;
+    private Long userSeq;   // 구분자
+    private String userId;      //아이디
+    private String userName;    //이름
+    private String userImg;     //개인 프로필 이미지 파일명
     private List<GrantedAuthority> authorities;
 
 
     @Override
     public String getUsername() {
-        return this.nickname;
+        return this.userName;
     }
 
     @Override
