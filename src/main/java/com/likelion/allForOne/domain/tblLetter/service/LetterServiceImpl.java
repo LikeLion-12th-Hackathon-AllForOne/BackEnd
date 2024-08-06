@@ -15,10 +15,12 @@ import com.likelion.allForOne.entity.*;
 import com.likelion.allForOne.global.response.ApiResponse;
 import com.likelion.allForOne.global.response.resEnum.ErrorCode;
 import com.likelion.allForOne.global.response.resEnum.SuccessCode;
+import com.likelion.allForOne.login.utils.CustomUserDetails;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,10 +47,11 @@ public class LetterServiceImpl implements LetterService{
      */
     @Override
     @Transactional
-    public ApiResponse<?> createLetter(CreateLetterDto createLetterDto, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
-                String userId = session.getAttribute("userId").toString();
+    public ApiResponse<?> createLetter(CreateLetterDto createLetterDto, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
+                String userId = userDetails.getUserId();
 
                 if (!userId.isEmpty() || userId != null) {
                     // 사용자 조회
@@ -120,14 +123,15 @@ public class LetterServiceImpl implements LetterService{
     /**
      * 편지 정보 조회
      * @param searchLetterInfo
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
-    public ApiResponse<?> searchLetterInfo(SearchLetterInfo searchLetterInfo, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
-                String letterFrom = session.getAttribute("userId").toString(); // 보내는 사람 ID
+    public ApiResponse<?> searchLetterInfo(SearchLetterInfo searchLetterInfo, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
+                String letterFrom = userDetails.getUserId();
                 String letterTo = searchLetterInfo.getLetter_to();                // 받는 사람 ID
                 String code_paper = searchLetterInfo.getCode_paper();
 
@@ -169,14 +173,15 @@ public class LetterServiceImpl implements LetterService{
     /**
      * 편지함 조회
      * @param searchLetterList
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
-    public ApiResponse<?> searchLetterList(SearchLetterList searchLetterList, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
-                String userId = session.getAttribute("userId").toString();
+    public ApiResponse<?> searchLetterList(SearchLetterList searchLetterList, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
+                String userId = userDetails.getUserId();
                 List<TblLetter> letterInfo;
                 int memberFrom = 0;
                 int memberTo = 0;
@@ -242,14 +247,15 @@ public class LetterServiceImpl implements LetterService{
     /**
      * 읽음 처리
      * @param updateReadLetter
-     * @param session
+     * @param authentication
      * @return ApiResponse<?>
      */
     @Override
     @Transactional
-    public ApiResponse<?> updateReadLetter(UpdateReadLetter updateReadLetter, HttpSession session) {
-        if (session != null) {
-            if (session.getAttribute("userId") != null) {
+    public ApiResponse<?> updateReadLetter(UpdateReadLetter updateReadLetter, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (userDetails != null) {
+            if (userDetails.getUserId() != null) {
                 Long letterSeq = updateReadLetter.getLetter_seq();
 
                 // 읽음 처리
