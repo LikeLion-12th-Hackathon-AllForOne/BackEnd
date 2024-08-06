@@ -25,7 +25,7 @@ public class SecurityConfig {
     private String refreshTokenKey;
 
     private static final String[] AUTH_WHITELIST = {
-            "/api/login/**"
+            "/api/login/**", "/api/code/**"
     };
 
     @Bean

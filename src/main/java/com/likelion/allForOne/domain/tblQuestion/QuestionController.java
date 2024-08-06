@@ -2,10 +2,12 @@ package com.likelion.allForOne.domain.tblQuestion;
 
 import com.likelion.allForOne.domain.tblQuestion.dto.QuestionRequestDto;
 import com.likelion.allForOne.domain.tblQuestion.service.QuestionServiceImpl;
+import com.likelion.allForOne.login.utils.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/question")
 public class QuestionController {
     private final QuestionServiceImpl questionService;
-    private final HttpServletRequest request;
 
     /**
      * 질문 추가하기
@@ -21,9 +22,9 @@ public class QuestionController {
      * @return ResponseEntity<?>
      */
     @PostMapping("/add")
-    public ResponseEntity<?> addQuestion(@RequestBody QuestionRequestDto.AddQuestion data){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> addQuestion(@RequestBody QuestionRequestDto.AddQuestion data, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(questionService.addQuestion(data, userSeq));
     }
 
@@ -33,9 +34,9 @@ public class QuestionController {
      * @return ResponseEntity<?>
      */
     @PostMapping("/tempSave")
-    public ResponseEntity<?> tempSaveAnswer(@RequestBody QuestionRequestDto.SaveAnswerList data){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> tempSaveAnswer(@RequestBody QuestionRequestDto.SaveAnswerList data, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(questionService.saveAnswer(1, data, userSeq));
     }
 
@@ -45,9 +46,9 @@ public class QuestionController {
      * @return ResponseEntity<?>
      */
     @PostMapping("/save")
-    public ResponseEntity<?> saveAnswer(@RequestBody QuestionRequestDto.SaveAnswerList data){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> saveAnswer(@RequestBody QuestionRequestDto.SaveAnswerList data, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(questionService.saveAnswer(0, data, userSeq));
     }
 
@@ -59,9 +60,10 @@ public class QuestionController {
      */
     @GetMapping("/today/question/{usedQuestionSeq}/answer/{memberSeq}")
     public ResponseEntity<?> findTodayQandA(@PathVariable("usedQuestionSeq") Long usedQuestionSeq,
-                                            @PathVariable("memberSeq") Long memberSeq){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+                                            @PathVariable("memberSeq") Long memberSeq,
+                                            Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(questionService.findTodayQandA(usedQuestionSeq, memberSeq, userSeq));
     }
 
@@ -71,9 +73,9 @@ public class QuestionController {
      * @return ResponseEntity<?>
      */
     @GetMapping("/last/{groupSeq}/questionList/{inpDate}")
-    public ResponseEntity<?> findLastQandA(@PathVariable("groupSeq") Long groupSeq, @PathVariable("inpDate") String inpDate){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> findLastQandA(@PathVariable("groupSeq") Long groupSeq, @PathVariable("inpDate") String inpDate, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(questionService.findLastQandA(groupSeq, userSeq, inpDate));
     }
 
@@ -83,9 +85,9 @@ public class QuestionController {
      * @return ResponseEntity<?>
      */
     @GetMapping("/someone/{memberTargetSeq}/questionList/{inpDate}")
-    public ResponseEntity<?> findSomeoneQAndA(@PathVariable("memberTargetSeq") Long memberTargetSeq, @PathVariable("inpDate") String inpDate){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> findSomeoneQAndA(@PathVariable("memberTargetSeq") Long memberTargetSeq, @PathVariable("inpDate") String inpDate, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(questionService.findSomeoneQAndA(memberTargetSeq, userSeq, inpDate));
     }
 
