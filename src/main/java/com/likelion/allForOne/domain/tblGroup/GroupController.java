@@ -2,10 +2,12 @@ package com.likelion.allForOne.domain.tblGroup;
 
 import com.likelion.allForOne.domain.tblGroup.dto.GroupRequestDto;
 import com.likelion.allForOne.domain.tblGroup.service.GroupServiceImpl;
+import com.likelion.allForOne.login.utils.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,9 +23,9 @@ public class GroupController {
      * @return ResponseEntity<?>
      */
     @PostMapping("/create")
-    public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> saveOneGroup(@RequestBody GroupRequestDto.saveOneGroup data, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(groupService.saveOneGroup(data, userSeq));
     }
 
@@ -32,9 +34,9 @@ public class GroupController {
      * @return ResponseEntity<?>
      */
     @GetMapping("/findList/joinGroup")
-    public ResponseEntity<?> findListJoinGroup(){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> findListJoinGroup(Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(groupService.findListJoinGroup(userSeq));
     }
 
@@ -44,9 +46,9 @@ public class GroupController {
      * @return ResponseEntity<?>
      */
     @GetMapping("/{groupSeq}/findInviteCode")
-    public ResponseEntity<?> findGroupInviteCode(@PathVariable("groupSeq") Long groupSeq){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> findGroupInviteCode(@PathVariable("groupSeq") Long groupSeq, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(groupService.findGroupInviteCode(groupSeq, userSeq));
     }
 
@@ -56,9 +58,9 @@ public class GroupController {
      * @return ResponseEntity<?>
      */
     @PostMapping("/join")
-    public ResponseEntity<?> saveGroupMemberByInviteCode(@RequestBody GroupRequestDto.saveGroupMemberByInviteCode data) {
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> saveGroupMemberByInviteCode(@RequestBody GroupRequestDto.saveGroupMemberByInviteCode data, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(groupService.saveGroupMemberByInviteCode(data, userSeq));
     }
 
@@ -68,9 +70,9 @@ public class GroupController {
      * @return ResponseEntity<?>
      */
     @GetMapping("/{groupSeq}/findDetails")
-    public ResponseEntity<?> findGroupDetail(@PathVariable("groupSeq") Long groupSeq){
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> findGroupDetail(@PathVariable("groupSeq") Long groupSeq, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(groupService.findGroupDetail(groupSeq, userSeq));
     }
 
@@ -80,9 +82,9 @@ public class GroupController {
      * @return ResponseEntity<?>
      */
     @PostMapping("/updateRole")
-    public ResponseEntity<?> updateRole(@RequestBody GroupRequestDto.updateRole data) {
-        HttpSession session = request.getSession(false);
-        Long userSeq = (Long) session.getAttribute("userSeq");
+    public ResponseEntity<?> updateRole(@RequestBody GroupRequestDto.updateRole data, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userSeq = userDetails.getUserSeq();
         return ResponseEntity.ok().body(groupService.updateRole(data, userSeq));
     }
 }
